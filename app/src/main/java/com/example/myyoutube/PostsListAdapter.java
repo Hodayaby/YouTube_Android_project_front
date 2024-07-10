@@ -74,6 +74,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return new PostViewHolder(itemView);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         if (posts != null) {
@@ -84,6 +85,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.channelImage.setImageResource(current.getChannelImage());
         }
     }
+
 
     @Override
     public int getItemCount() {

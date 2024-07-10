@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class HomeScreenActivity extends AppCompatActivity {
+public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
     private List<Post> postsList;
     private PostsListAdapter postsListAdapter;
@@ -88,18 +88,11 @@ public class HomeScreenActivity extends AppCompatActivity {
 
         // Initialize post list and adapter
         postsList = new ArrayList<>();
-        postsListAdapter = new PostsListAdapter(this, count -> {
-            // Show or hide the no results text view based on the filter result count
-            if (count == 0) {
-                noResultsText.setVisibility(View.VISIBLE);
-            } else {
-                noResultsText.setVisibility(View.GONE);
-            }
-        });
+        postsListAdapter = new PostsListAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
 
-        // Load videos from JSON file=
+        // Load videos from JSON file
         loadVideosFromJSON();
 
         Log.d("HomeScreenActivity", "Videos loaded from JSON");
@@ -190,7 +183,6 @@ public class HomeScreenActivity extends AppCompatActivity {
         }
     }
 
-
     private void updateUserDetails() {
         User currentUser = User.getInstance();
         if (currentUser.getProfileImage() != null) {
@@ -204,6 +196,15 @@ public class HomeScreenActivity extends AppCompatActivity {
 
         if (currentUser.getDisplayName() != null) {
             displayNameTextView.setText("Welcome " + currentUser.getDisplayName());
+        }
+    }
+
+    @Override
+    public void onPostsFiltered(int count) {
+        if (count == 0) {
+            noResultsText.setVisibility(View.VISIBLE);
+        } else {
+            noResultsText.setVisibility(View.GONE);
         }
     }
 }

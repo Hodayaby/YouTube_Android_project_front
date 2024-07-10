@@ -2,6 +2,7 @@ package com.example.myyoutube;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -14,10 +15,9 @@ public class VideoViewActivity extends AppCompatActivity {
     private TextView videoTitleTextView;
     private TextView videoAuthorTextView;
     private TextView videoViewsTextView;
-    private TextView videoUploadTimeTextView;
-    private ImageView videoPicImageView;
     private ImageView videoChannelImageView;
     private VideoView videoView;
+    private EditText commentEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,28 +26,24 @@ public class VideoViewActivity extends AppCompatActivity {
 
         // Initialize views
         videoTitleTextView = findViewById(R.id.videoTitle);
-        videoAuthorTextView = findViewById(R.id.videoAuthor);
-        videoViewsTextView = findViewById(R.id.videoViews);
-        videoUploadTimeTextView = findViewById(R.id.videoUploadTime);
-        videoPicImageView = findViewById(R.id.videoPic);
+        videoAuthorTextView = findViewById(R.id.videoArtist);
+        videoViewsTextView = findViewById(R.id.videoDetails);
         videoChannelImageView = findViewById(R.id.videoChannelImage);
         videoView = findViewById(R.id.videoView);
+        commentEditText = findViewById(R.id.commentBox); // Ensure this matches the ID in XML
 
         // Get data from intent
         String videoTitle = getIntent().getStringExtra("videoTitle");
         String videoAuthor = getIntent().getStringExtra("videoAuthor");
         String videoViews = getIntent().getStringExtra("videoViews");
         String videoUploadTime = getIntent().getStringExtra("videoUploadTime");
-        int videoPic = getIntent().getIntExtra("videoPic", 0);
         int videoChannelImage = getIntent().getIntExtra("videoChannelImage", 0);
         String videoUri = getIntent().getStringExtra("videoUri");
 
         // Set data to views
         videoTitleTextView.setText(videoTitle);
         videoAuthorTextView.setText(videoAuthor);
-        videoViewsTextView.setText(videoViews);
-        videoUploadTimeTextView.setText(videoUploadTime);
-        videoPicImageView.setImageResource(videoPic);
+        videoViewsTextView.setText(videoViews + " • " + videoUploadTime);
         videoChannelImageView.setImageResource(videoChannelImage);
 
         // Set up the VideoView

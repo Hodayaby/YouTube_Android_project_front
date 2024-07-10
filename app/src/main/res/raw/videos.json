@@ -5,7 +5,8 @@
     "views": "714K",
     "uploadTime": "7 months ago",
     "thumbnail": "lalalandvid",
-    "channelImage": "lalachanel"
+    "channelImage": "lalachanel",
+    "videoUri": "android.resource://com.example.myyoutube/raw/lalaland"
   },
   {
     "author": "Sara Barellies",
@@ -13,7 +14,8 @@
     "views": "100M",
     "uploadTime": "7 year ago",
     "thumbnail": "sutbmvid",
-    "channelImage": "sutbmicon"
+    "channelImage": "sutbmicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/sheusetobemine"
   },
   {
     "author": "Taylor Swift",
@@ -21,7 +23,8 @@
     "views": "15M",
     "uploadTime": "1 year ago",
     "thumbnail": "ihateithere",
-    "channelImage": "ts"
+    "channelImage": "ts",
+    "videoUri": "android.resource://com.example.myyoutube/raw/ihatetthere"
   },
   {
     "author": "Frank Sinatra",
@@ -29,7 +32,8 @@
     "views": "65M",
     "uploadTime": "10 year ago",
     "thumbnail": "mywayvid",
-    "channelImage": "mywayicon"
+    "channelImage": "mywayicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/myway"
   },
   {
     "author": "Carol King",
@@ -37,7 +41,8 @@
     "views": "45M",
     "uploadTime": "14 year ago",
     "thumbnail": "carolvid",
-    "channelImage": "carolicon"
+    "channelImage": "carolicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/youvegotafriend"
   },
   {
     "author": "Les Miserables",
@@ -45,7 +50,8 @@
     "views": "19M",
     "uploadTime": "4 year ago",
     "thumbnail": "onmyownvid",
-    "channelImage": "lalachanel"
+    "channelImage": "lalachanel",
+    "videoUri": "android.resource://com.example.myyoutube/raw/onmyown"
   },
   {
     "author": "Sam Hunt",
@@ -53,7 +59,8 @@
     "views": "12M",
     "uploadTime": "1 year ago",
     "thumbnail": "takeyourtimevid",
-    "channelImage": "samhunt"
+    "channelImage": "samhunt",
+    "videoUri": "android.resource://com.example.myyoutube/raw/takeyourtime"
   },
   {
     "author": "Sebastián Yatra",
@@ -61,7 +68,8 @@
     "views": "123M",
     "uploadTime": "3 year ago",
     "thumbnail": "syvid",
-    "channelImage": "syicon"
+    "channelImage": "syicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/sebsyatra"
   },
   {
     "author": "The Smith",
@@ -69,7 +77,8 @@
     "views": "543M",
     "uploadTime": "9 year ago",
     "thumbnail": "thesmithvid",
-    "channelImage": "thesmithicon"
+    "channelImage": "thesmithicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/smith"
   },
   {
     "author": "Carly Simon",
@@ -77,6 +86,7 @@
     "views": "800K",
     "uploadTime": "16 year ago",
     "thumbnail": "nobodyvid",
-    "channelImage": "nbodyicon"
+    "channelImage": "nbodyicon",
+    "videoUri": "android.resource://com.example.myyoutube/raw/nobody"
   }
 ]
