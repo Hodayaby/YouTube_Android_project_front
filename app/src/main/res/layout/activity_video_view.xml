@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/videoPic"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/lalaland" />
+
+    <ImageView
+        android:id="@+id/videoChannelImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/videoPic"
+        android:layout_margin="16dp"
+        android:src="@drawable/lalachanel" />
+
+    <TextView
+        android:id="@+id/videoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoPic"
+        android:layout_toEndOf="@id/videoChannelImage"
+        android:layout_marginStart="8dp"
+        android:text="Video Title"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/videoAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoTitle"
+        android:layout_toEndOf="@id/videoChannelImage"
+        android:layout_marginStart="8dp"
+        android:text="Video Author"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/videoViews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoAuthor"
+        android:layout_toEndOf="@id/videoChannelImage"
+        android:layout_marginStart="8dp"
+        android:text="Views"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/videoUploadTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoViews"
+        android:layout_toEndOf="@id/videoChannelImage"
+        android:layout_marginStart="8dp"
+        android:text="Upload Time"
+        android:textSize="14sp" />
+
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/videoUploadTime"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- You can add buttons for like, share, comment, etc. here -->
+
+</RelativeLayout>
