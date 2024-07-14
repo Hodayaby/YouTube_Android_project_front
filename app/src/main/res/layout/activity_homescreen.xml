@@ -5,19 +5,19 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeScreenActivity">
+    tools:context=".HomeScreenActivity"
+    android:theme="@style/Theme.MyYoutube">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <!-- Header -->
         <LinearLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorOnPrimary"
+            android:background="@color/header_background"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="10dp"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/edittext_background"
+                android:background="@color/search_bar_background"
                 android:hint="Search videos"
                 android:minHeight="48dp"
                 android:padding="10dp" />
@@ -143,6 +143,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- NavigationView for the drawer menu -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"

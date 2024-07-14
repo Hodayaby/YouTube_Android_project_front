@@ -5,18 +5,17 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:ignore="ExtraText">"
-<!--    tools:context=".MainActivity">-->
+    android:theme="@style/Theme.MyYoutube"
+    tools:context=".LoginActivity">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="287dp"
         android:layout_gravity="center"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/youtube_logo" />
+        android:src="@drawable/youtube_logo" /> <!-- This will switch automatically -->
 
     <EditText
         android:id="@+id/username"
@@ -35,7 +34,6 @@
         android:textSize="14sp"
         android:paddingStart="8dp"
         android:text="" />
-
 
     <EditText
         android:id="@+id/password"
@@ -67,13 +65,13 @@
 
     <Button
         android:id="@+id/login_button"
-        android:layout_width="379dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@color/youtube_red"
+        style="@style/YouTubeButton"
         android:text="Login"
-        app:iconTint="#FE0000"
-        app:rippleColor="#FE0000" />
+        app:iconTint="@color/youtube_red"
+        app:rippleColor="@color/youtube_red" />
 
     <Button
         android:id="@+id/registerMoveBtn"
@@ -87,9 +85,3 @@
         android:textSize="16sp" />
 
 </LinearLayout>
-
-
-
-
-
-

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_favorite_videos"
@@ -13,3 +12,4 @@
         android:icon="@drawable/ic_logout"
         android:title="@string/nav_logout" />
 </menu>
+

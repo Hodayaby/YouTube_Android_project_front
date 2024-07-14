@@ -3,14 +3,19 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- existing colors -->
+    <!-- Existing colors -->
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryVariant">#3700B3</color>
     <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorSecondary">#03DAC5</color>
     <color name="colorOnSecondary">#000000</color>
 
-    <!-- adding my color -->
+    <!-- Adding my color -->
     <color name="youtube_red">#D32F2F</color>
     <!-- Other existing colors -->
+    <color name="post_background">#FFFFFF</color> <!-- White color for posts in day mode -->
+
+    <!-- Adding colors for search bar and header -->
+    <color name="header_background">@color/white</color> <!-- White background for header in day mode -->
+    <color name="search_bar_background">@color/white</color> <!-- White background for search bar in day mode -->
 </resources>

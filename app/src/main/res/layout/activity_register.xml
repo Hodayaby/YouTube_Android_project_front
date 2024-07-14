@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:padding="16dp">
+    android:theme="@style/Theme.MyYoutube"
+    tools:context=".RegisterActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <!-- YouTube Logo -->
         <ImageView
@@ -70,7 +73,7 @@
             android:layout_height="84dp"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
-            android:background="@android:color/darker_gray"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Profile Image"
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_camera" />
@@ -83,9 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="8dp"
-            android:background="@color/youtube_red"
             android:text="Upload Image" />
-
 
         <!-- Error message for Image Upload -->
         <TextView
@@ -107,9 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/youtube_red"
             android:text="Register" />
-
 
     </LinearLayout>
 </ScrollView>
