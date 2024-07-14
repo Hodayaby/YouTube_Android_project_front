@@ -18,4 +18,10 @@
     <!-- Adding colors for search bar and header -->
     <color name="header_background">@color/white</color> <!-- White background for header in day mode -->
     <color name="search_bar_background">@color/white</color> <!-- White background for search bar in day mode -->
+    <!-- new attributes for light mode -->
+    <color name="channelBackground">#F1F1F1</color>
+    <color name="commentBoxBackground">#EEEEEE</color>
+    <color name="textColorPrimary">#000000</color>
+    <color name="textColorSecondary">#888888</color>
+    <color name="iconColor">#5B5B5B</color>
 </resources>

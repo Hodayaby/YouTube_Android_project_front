@@ -108,8 +108,8 @@
             app:maxImageSize="56dp"
             android:src="@drawable/ic_account"
             android:contentDescription="@string/todo"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/circular_image"
+            app:backgroundTint="@android:color/transparent"
+            app:borderWidth="0dp"
             android:clipToOutline="true" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
