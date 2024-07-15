@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey;
 
 import org.w3c.dom.Comment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,13 +21,14 @@ public class Post {
     private int channelImage;
     private String views;
     private String uploadTime;
-    private String videoUri; // הוספת URI של הווידאו
+    private String videoUri;
     private int dislikes;
     private List<Comment> comments;
 
     public Post() {
         this.pic = R.drawable.lalaland;
         this.channelImage = R.drawable.lalachanel;
+        this.comments = new ArrayList<>();
     }
 
     public Post(String author, String content, int pic, int channelImage, String views, String uploadTime, String videoUri) {
@@ -36,7 +38,8 @@ public class Post {
         this.channelImage = channelImage;
         this.views = views;
         this.uploadTime = uploadTime;
-        this.videoUri = videoUri; // אתחול ה-URI של הווידאו
+        this.videoUri = videoUri;
+        this.comments = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -48,7 +51,6 @@ public class Post {
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
-
 
     public int getPic() { return pic; }
     public void setPic(int pic) { this.pic = pic; }
@@ -80,9 +82,8 @@ public class Post {
     public int getDislikes() {
         return dislikes;
     }
-    public void setDislikes(int dislikes) {
-        this.dislikes = dislikes;
-    }
+    public void setDislikes(int dislikes) { this.dislikes = dislikes; }
+
     // Add getter and setter for comments
     public List<Comment> getComments() {
         return comments;
@@ -90,5 +91,15 @@ public class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    // Add a method to add a comment
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
+
+    // Add a method to remove a comment
+    public void removeComment(Comment comment) {
+        this.comments.remove(comment);
     }
 }

@@ -216,6 +216,13 @@
                 android:textStyle="bold"
                 android:textColor="@color/textColorPrimary" />
 
+            <!-- LinearLayout to hold all comments -->
+            <LinearLayout
+                android:id="@+id/commentsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
             <!-- EditText for adding a new comment -->
             <EditText
                 android:id="@+id/commentBox"
