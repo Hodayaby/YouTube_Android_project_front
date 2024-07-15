@@ -1,6 +1,8 @@
 package com.example.myyoutube;
 
 import android.graphics.Bitmap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     private String username;
@@ -8,14 +10,13 @@ public class User {
     private String displayName;
     private transient Bitmap profileImage; // transient to avoid serialization
     private String profileImageBase64; // Base64 representation of the profile image
+    private List<Post> likedPosts; // List of liked posts
+    private List<Post> dislikedPosts; // List of disliked posts
 
-    private static final User INSTANCE = new User(); // Singleton instance
-
-    // Private constructor to prevent instantiation from other classes
-    private User() {}
-
-    public static User getInstance() {
-        return INSTANCE;
+    // Constructor to initialize lists
+    public User() {
+        likedPosts = new ArrayList<>();
+        dislikedPosts = new ArrayList<>();
     }
 
     // Getters and setters
@@ -57,5 +58,41 @@ public class User {
 
     public void setProfileImageBase64(String profileImageBase64) {
         this.profileImageBase64 = profileImageBase64;
+    }
+
+    public List<Post> getLikedPosts() {
+        return likedPosts;
+    }
+
+    public void addLikedPost(Post post) {
+        if (!isLiked(post)) {
+            likedPosts.add(post);
+        }
+    }
+
+    public void removeLikedPost(Post post) {
+        likedPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
+    }
+
+    public boolean isLiked(Post post) {
+        return likedPosts.stream().anyMatch(p -> p.getVideoUri().equals(post.getVideoUri()));
+    }
+
+    public List<Post> getDislikedPosts() {
+        return dislikedPosts;
+    }
+
+    public void addDislikedPost(Post post) {
+        if (!isDisliked(post)) {
+            dislikedPosts.add(post);
+        }
+    }
+
+    public void removeDislikedPost(Post post) {
+        dislikedPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
+    }
+
+    public boolean isDisliked(Post post) {
+        return dislikedPosts.stream().anyMatch(p -> p.getVideoUri().equals(post.getVideoUri()));
     }
 }

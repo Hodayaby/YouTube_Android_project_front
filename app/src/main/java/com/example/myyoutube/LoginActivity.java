@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -21,6 +22,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set theme based on ThemeManager
+        setDarkMode(ThemeManager.isDarkMode());
+
         setContentView(R.layout.activity_login);
 
         // Initialize UserListManager
@@ -41,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // Validate username and password
             if (validateLogin(username, password)) {
-                // Load current user to Singleton
+                // Load current user to UserListManager
                 loadCurrentUser(username);
 
                 // Proceed to HomeScreenActivity
@@ -103,15 +108,19 @@ public class LoginActivity extends AppCompatActivity {
         return false;
     }
 
-    // Load current user details into Singleton
+    // Load current user details into UserListManager
     private void loadCurrentUser(String username) {
         User user = userListManager.getUserByUsername(username);
         if (user != null) {
-            User currentUser = User.getInstance();
-            currentUser.setUsername(user.getUsername());
-            currentUser.setPassword(user.getPassword());
-            currentUser.setDisplayName(user.getDisplayName());
-            currentUser.setProfileImage(user.getProfileImage());
+            userListManager.setCurrentUser(user);
+        }
+    }
+
+    private void setDarkMode(boolean isDarkMode) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
 }

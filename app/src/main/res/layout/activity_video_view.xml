@@ -64,6 +64,7 @@
                     android:orientation="vertical">
 
                     <ImageButton
+                        android:id="@+id/likeButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -89,6 +90,7 @@
                     android:orientation="vertical">
 
                     <ImageButton
+                        android:id="@+id/dislikeButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -114,6 +116,7 @@
                     android:orientation="vertical">
 
                     <ImageButton
+                        android:id="@+id/editButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -139,6 +142,7 @@
                     android:orientation="vertical">
 
                     <ImageButton
+                        android:id="@+id/shareButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
@@ -164,6 +168,7 @@
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:background="@color/channelBackground">
+
 
                 <!-- Channel profile image -->
                 <ImageView

@@ -24,5 +24,6 @@
     <color name="textColorSecondary">#888888</color>
 
     <color name="iconColor">#FFFFFF</color>
+    <color name="blue">#0049FF</color>
 
 </resources>

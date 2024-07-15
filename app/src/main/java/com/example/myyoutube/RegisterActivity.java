@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -44,6 +45,10 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set theme based on ThemeManager
+        setDarkMode(ThemeManager.isDarkMode());
+
         setContentView(R.layout.activity_register);
 
         // Initialize UserListManager
@@ -224,7 +229,7 @@ public class RegisterActivity extends AppCompatActivity {
     // Method to save user details
     private void saveUserDetails(String username, String password, String displayName, Bitmap profileImage) {
         // Create a new user instance
-        User user = User.getInstance();
+        User user = new User();
         user.setUsername(username);
         user.setPassword(password);
         user.setDisplayName(displayName);
@@ -262,5 +267,13 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         return hasLetter && hasDigit;
+    }
+
+    private void setDarkMode(boolean isDarkMode) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 }

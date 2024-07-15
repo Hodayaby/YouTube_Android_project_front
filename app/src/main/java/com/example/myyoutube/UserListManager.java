@@ -11,6 +11,7 @@ import java.util.List;
 public class UserListManager {
     private static final UserListManager INSTANCE = new UserListManager();
     private static List<User> userList = new ArrayList<>();
+    private User currentUser;
 
     // Private constructor to prevent instantiation from other classes
     private UserListManager() {
@@ -50,8 +51,16 @@ public class UserListManager {
         return false;
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }
+
     // Method to encode Bitmap to String
-    private String encodeBitmapToBase64(Bitmap bitmap) {
+    public String encodeBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -59,7 +68,7 @@ public class UserListManager {
     }
 
     // Method to decode String to Bitmap
-    private Bitmap decodeBase64ToBitmap(String base64Str) {
+    public Bitmap decodeBase64ToBitmap(String base64Str) {
         byte[] decodedBytes = Base64.decode(base64Str, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
     }

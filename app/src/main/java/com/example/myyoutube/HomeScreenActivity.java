@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +34,7 @@ import java.util.Scanner;
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
     private List<Post> postsList;
+    private List<Post> allPostsList; // For storing all posts separately
     private PostsListAdapter postsListAdapter;
     private EditText searchBar;
     private ImageView profileButton;
@@ -46,10 +49,16 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     private ImageView profileImageView;
 
     private UserListManager userListManager;
+    private User currentUser;
+    private boolean showingFavoriteVideos = false; // To track if we are showing favorite videos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set theme based on ThemeManager
+        setDarkMode(ThemeManager.isDarkMode());
+
         setContentView(R.layout.activity_homescreen);
         Log.d("HomeScreenActivity", "HomeScreenActivity Started");
         Toast.makeText(this, "HomeScreenActivity Started", Toast.LENGTH_SHORT).show();
@@ -88,6 +97,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
         // Initialize post list and adapter
         postsList = new ArrayList<>();
+        allPostsList = new ArrayList<>(); // Initialize all posts list
         postsListAdapter = new PostsListAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
@@ -120,13 +130,17 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         findViewById(R.id.btnHome).setOnClickListener(v -> {
             searchBar.setText(""); // Clear the search bar
             recyclerView.scrollToPosition(0); // Scroll to the top
+
+            // If showing favorite videos, reload all videos
+            if (showingFavoriteVideos) {
+                postsListAdapter.setPosts(allPostsList);
+                showingFavoriteVideos = false;
+            }
         });
 
         // Set up profile button click listener (future implementation)
         profileButton.setOnClickListener(v -> {
             // Handle profile button click
-            // Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-            // startActivity(intent);
         });
 
         // Set up login button click listener
@@ -139,11 +153,14 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_favorite_videos) {
-                // Handle favorite videos click
-                Toast.makeText(this, "Favorite Videos Clicked", Toast.LENGTH_SHORT).show();
+                showFavoriteVideos();
             } else if (id == R.id.nav_dark_mode) {
                 // Handle dark mode click
-                Toast.makeText(this, "Dark Mode Clicked", Toast.LENGTH_SHORT).show();
+                boolean isDarkMode = !ThemeManager.isDarkMode();
+                ThemeManager.setDarkMode(isDarkMode);
+                setDarkMode(isDarkMode);
+                updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), isDarkMode); // Update the menu item
+                recreate(); // Recreate the activity to apply the new theme
             } else if (id == R.id.nav_logout) {
                 // Handle logout click
                 Toast.makeText(this, "Logout Clicked", Toast.LENGTH_SHORT).show();
@@ -151,6 +168,27 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+
+        // Update the menu item initially
+        updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), ThemeManager.isDarkMode());
+    }
+
+    private void setDarkMode(boolean isDarkMode) {
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    private void updateMenuTitle(MenuItem menuItem, boolean isDarkMode) {
+        if (isDarkMode) {
+            menuItem.setTitle("Light Mode");
+            menuItem.setIcon(R.drawable.ic_sun); // Replace with the sun icon
+        } else {
+            menuItem.setTitle("Dark Mode");
+            menuItem.setIcon(R.drawable.ic_dark); // Replace with the moon icon
+        }
     }
 
     private void loadVideosFromJSON() {
@@ -170,9 +208,10 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
                         getResources().getIdentifier(jsonObject.getString("channelImage"), "drawable", getPackageName()),
                         jsonObject.getString("views"),
                         jsonObject.getString("uploadTime"),
-                        jsonObject.getString("videoUri") // הוספת ה-URI של הווידאו
+                        jsonObject.getString("videoUri")
                 );
                 postsList.add(post);
+                allPostsList.add(post); // Add to all posts list as well
             }
 
             // Update adapter with the posts
@@ -184,18 +223,36 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     }
 
     private void updateUserDetails() {
-        User currentUser = User.getInstance();
-        if (currentUser.getProfileImage() != null) {
-            profileImageView.setImageBitmap(currentUser.getProfileImage());
-            profileButton.setImageBitmap(currentUser.getProfileImage()); // עדכון תמונת המשתמש בכפתור החשבון
-        }
+        currentUser = userListManager.getCurrentUser();
+        if (currentUser != null) {
+            if (currentUser.getProfileImage() != null) {
+                profileImageView.setImageBitmap(currentUser.getProfileImage());
+                profileButton.setImageBitmap(currentUser.getProfileImage());
+            } else {
+                profileButton.setImageResource(R.drawable.ic_account);
+            }
+            if (currentUser.getUsername() != null) {
+                usernameTextView.setText("username: " + currentUser.getUsername());
+            }
 
-        if (currentUser.getUsername() != null) {
-            usernameTextView.setText("username: " + currentUser.getUsername());
+            if (currentUser.getDisplayName() != null) {
+                displayNameTextView.setText("Welcome " + currentUser.getDisplayName());
+            }
+        } else {
+            usernameTextView.setText("No user logged in");
+            displayNameTextView.setText("Welcome");
+            profileButton.setImageResource(R.drawable.ic_account);
         }
+    }
 
-        if (currentUser.getDisplayName() != null) {
-            displayNameTextView.setText("Welcome " + currentUser.getDisplayName());
+    private void showFavoriteVideos() {
+        currentUser = userListManager.getCurrentUser();
+        if (currentUser != null && currentUser.getUsername() != null) {
+            List<Post> likedPosts = currentUser.getLikedPosts();
+            postsListAdapter.setPosts(likedPosts);
+            showingFavoriteVideos = true; // Update the flag
+        } else {
+            Toast.makeText(this, "Please login to see your favorite videos", Toast.LENGTH_SHORT).show();
         }
     }
 

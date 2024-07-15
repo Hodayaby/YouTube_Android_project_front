@@ -3,6 +3,10 @@ package com.example.myyoutube;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import org.w3c.dom.Comment;
+
+import java.util.List;
+
 @Entity
 public class Post {
 
@@ -17,6 +21,8 @@ public class Post {
     private String views;
     private String uploadTime;
     private String videoUri; // הוספת URI של הווידאו
+    private int dislikes;
+    private List<Comment> comments;
 
     public Post() {
         this.pic = R.drawable.lalaland;
@@ -43,8 +49,6 @@ public class Post {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public int getLikes() { return likes; }
-    public void setLikes(int likes) { this.likes = likes; }
 
     public int getPic() { return pic; }
     public void setPic(int pic) { this.pic = pic; }
@@ -60,4 +64,31 @@ public class Post {
 
     public String getVideoUri() { return videoUri; }
     public void setVideoUri(String videoUri) { this.videoUri = videoUri; }
+
+    public void addLike() {
+        this.likes++;
+    }
+
+    public void addDislike() {
+        this.dislikes++;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+    public void setLikes(int likes) { this.likes = likes; }
+    public int getDislikes() {
+        return dislikes;
+    }
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+    // Add getter and setter for comments
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
 }
