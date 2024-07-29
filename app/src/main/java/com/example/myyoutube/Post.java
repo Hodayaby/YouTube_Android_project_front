@@ -3,10 +3,10 @@ package com.example.myyoutube;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import org.w3c.dom.Comment;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class Post {
@@ -16,30 +16,28 @@ public class Post {
 
     private String author;
     private String content;
-    private int likes;
-    private int pic;
+    private String imageUri; // שינוי ל-String כדי לתמוך ב-URI של תמונה
     private int channelImage;
     private String views;
     private String uploadTime;
     private String videoUri;
-    private int dislikes;
-    private List<Comment> comments;
+
+    // Static map to store comments for each post
+    private static Map<String, List<Comment>> commentsMap = new HashMap<>();
 
     public Post() {
-        this.pic = R.drawable.lalaland;
-        this.channelImage = R.drawable.lalachanel;
-        this.comments = new ArrayList<>();
+        // Default constructor
     }
 
-    public Post(String author, String content, int pic, int channelImage, String views, String uploadTime, String videoUri) {
+    public Post(String author, String content, String imageUri, int channelImage, String views, String uploadTime, String videoUri) {
         this.author = author;
         this.content = content;
-        this.pic = pic;
+        this.imageUri = imageUri;
         this.channelImage = channelImage;
         this.views = views;
         this.uploadTime = uploadTime;
         this.videoUri = videoUri;
-        this.comments = new ArrayList<>();
+        commentsMap.putIfAbsent(videoUri, new ArrayList<>());
     }
 
     // Getters and Setters
@@ -52,8 +50,8 @@ public class Post {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public int getPic() { return pic; }
-    public void setPic(int pic) { this.pic = pic; }
+    public String getImageUri() { return imageUri; }
+    public void setImageUri(String imageUri) { this.imageUri = imageUri; }
 
     public int getChannelImage() { return channelImage; }
     public void setChannelImage(int channelImage) { this.channelImage = channelImage; }
@@ -67,39 +65,18 @@ public class Post {
     public String getVideoUri() { return videoUri; }
     public void setVideoUri(String videoUri) { this.videoUri = videoUri; }
 
-    public void addLike() {
-        this.likes++;
-    }
-
-    public void addDislike() {
-        this.dislikes++;
-    }
-
-    public int getLikes() {
-        return likes;
-    }
-    public void setLikes(int likes) { this.likes = likes; }
-    public int getDislikes() {
-        return dislikes;
-    }
-    public void setDislikes(int dislikes) { this.dislikes = dislikes; }
-
-    // Add getter and setter for comments
+    // Get comments from the static map
     public List<Comment> getComments() {
-        return comments;
+        return commentsMap.get(videoUri);
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    // Add a method to add a comment
+    // Add a comment to the static map
     public void addComment(Comment comment) {
-        this.comments.add(comment);
+        commentsMap.get(videoUri).add(comment);
     }
 
-    // Add a method to remove a comment
+    // Remove a comment from the static map
     public void removeComment(Comment comment) {
-        this.comments.remove(comment);
+        commentsMap.get(videoUri).remove(comment);
     }
 }

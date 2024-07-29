@@ -2,6 +2,7 @@ package com.example.myyoutube;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,23 +37,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             videoDetails = itemView.findViewById(R.id.videoDetails);
             ivPic = itemView.findViewById(R.id.thumbnail);
             channelImage = itemView.findViewById(R.id.channelImage);
-
-            // Add click listener to the itemView
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    Post current = posts.get(position);
-                    Intent intent = new Intent(itemView.getContext(), VideoViewActivity.class);
-                    intent.putExtra("videoTitle", current.getContent());
-                    intent.putExtra("videoAuthor", current.getAuthor());
-                    intent.putExtra("videoViews", current.getViews());
-                    intent.putExtra("videoUploadTime", current.getUploadTime());
-                    intent.putExtra("videoPic", current.getPic());
-                    intent.putExtra("videoChannelImage", current.getChannelImage());
-                    intent.putExtra("videoUri", current.getVideoUri()); // Add video URI to intent
-                    itemView.getContext().startActivity(intent);
-                }
-            });
         }
     }
 
@@ -74,18 +58,30 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         return new PostViewHolder(itemView);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         if (posts != null) {
             final Post current = posts.get(position);
             holder.videoTitle.setText(current.getContent());
             holder.videoDetails.setText(current.getAuthor() + " • " + current.getViews() + " • " + current.getUploadTime());
-            holder.ivPic.setImageResource(current.getPic());
+            holder.ivPic.setImageURI(Uri.parse(current.getImageUri())); // Change to setImageURI
             holder.channelImage.setImageResource(current.getChannelImage());
+
+            // Add click listener to the itemView
+            holder.itemView.setOnClickListener(v -> {
+                Context context = holder.itemView.getContext();
+                Intent intent = new Intent(context, VideoViewActivity.class);
+                intent.putExtra("videoTitle", current.getContent());
+                intent.putExtra("videoAuthor", current.getAuthor());
+                intent.putExtra("videoViews", current.getViews());
+                intent.putExtra("videoUploadTime", current.getUploadTime());
+                intent.putExtra("videoPic", current.getImageUri()); // Change to getImageUri
+                intent.putExtra("videoChannelImage", current.getChannelImage());
+                intent.putExtra("videoUri", current.getVideoUri()); // Add video URI to intent
+                context.startActivity(intent);
+            });
         }
     }
-
 
     @Override
     public int getItemCount() {

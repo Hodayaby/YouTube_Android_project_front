@@ -37,6 +37,7 @@
         <!-- פעילות למסך הבית -->
         <activity android:name=".HomeScreenActivity" />
         <activity android:name=".VideoViewActivity" />
+        <activity android:name=".UploadVideoActivity" />
     </application>
 
 </manifest>

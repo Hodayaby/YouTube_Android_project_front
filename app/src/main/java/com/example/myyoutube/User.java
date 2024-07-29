@@ -12,11 +12,13 @@ public class User {
     private String profileImageBase64; // Base64 representation of the profile image
     private List<Post> likedPosts; // List of liked posts
     private List<Post> dislikedPosts; // List of disliked posts
+    private List<Post> userPosts; // List of user's own posts
 
     // Constructor to initialize lists
     public User() {
         likedPosts = new ArrayList<>();
         dislikedPosts = new ArrayList<>();
+        userPosts = new ArrayList<>();
     }
 
     // Getters and setters
@@ -94,5 +96,17 @@ public class User {
 
     public boolean isDisliked(Post post) {
         return dislikedPosts.stream().anyMatch(p -> p.getVideoUri().equals(post.getVideoUri()));
+    }
+
+    public List<Post> getUserPosts() {
+        return userPosts;
+    }
+
+    public void addUserPost(Post post) {
+        userPosts.add(post);
+    }
+
+    public void removeUserPost(Post post) {
+        userPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
     }
 }

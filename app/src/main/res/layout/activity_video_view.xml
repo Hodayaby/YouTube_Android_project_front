@@ -205,6 +205,7 @@
 
             </LinearLayout>
 
+
             <!-- TextView for comments label -->
             <TextView
                 android:id="@+id/commentsLabel"
@@ -233,6 +234,16 @@
                 android:padding="10dp"
                 android:background="@color/commentBoxBackground"
                 android:textColor="@color/textColorPrimary" />
+
+
+            <!-- Button to add a comment -->
+            <Button
+                android:id="@+id/addCommentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Comment" />
+
+
 
         </LinearLayout>
     </ScrollView>

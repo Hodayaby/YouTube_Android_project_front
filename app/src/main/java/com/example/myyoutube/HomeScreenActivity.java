@@ -20,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
@@ -27,19 +28,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
-    private List<Post> postsList;
-    private List<Post> allPostsList; // For storing all posts separately
-    private PostsListAdapter postsListAdapter;
+    public static PostsListAdapter postsListAdapter; // Static adapter
+    public static RecyclerView recyclerView; // Static RecyclerView
     private EditText searchBar;
     private ImageView profileButton;
     private TextView noResultsText;
-    private RecyclerView recyclerView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
@@ -88,6 +86,13 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         // Set up menu button click listener to open drawer
         findViewById(R.id.menuButton).setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
+        // Set up floating action button to open UploadVideoActivity
+        FloatingActionButton btnAdd = findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeScreenActivity.this, UploadVideoActivity.class);
+            startActivity(intent);
+        });
+
         Log.d("HomeScreenActivity", "Views initialized");
 
         // Load current user profile image and details
@@ -95,17 +100,18 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
         Log.d("HomeScreenActivity", "Profile image and details loaded");
 
-        // Initialize post list and adapter
-        postsList = new ArrayList<>();
-        allPostsList = new ArrayList<>(); // Initialize all posts list
+        // Initialize adapter and recyclerView
         postsListAdapter = new PostsListAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
 
-        // Load videos from JSON file
-        loadVideosFromJSON();
-
-        Log.d("HomeScreenActivity", "Videos loaded from JSON");
+        // Load videos from JSON file if the lists are empty
+        if (userListManager.getAllPosts().isEmpty()) {
+            loadVideosFromJSON();
+        } else {
+            // Update adapter with existing posts
+            postsListAdapter.setPosts(userListManager.getAllPosts());
+        }
 
         // Set up search bar text change listener
         searchBar.addTextChangedListener(new TextWatcher() {
@@ -133,7 +139,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
             // If showing favorite videos, reload all videos
             if (showingFavoriteVideos) {
-                postsListAdapter.setPosts(allPostsList);
+                postsListAdapter.setPosts(userListManager.getAllPosts());
                 showingFavoriteVideos = false;
             }
         });
@@ -204,18 +210,17 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
                 Post post = new Post(
                         jsonObject.getString("author"),
                         jsonObject.getString("content"),
-                        getResources().getIdentifier(jsonObject.getString("thumbnail"), "drawable", getPackageName()),
+                        "android.resource://com.example.myyoutube/drawable/" + jsonObject.getString("thumbnail"), // Using string path for image
                         getResources().getIdentifier(jsonObject.getString("channelImage"), "drawable", getPackageName()),
                         jsonObject.getString("views"),
                         jsonObject.getString("uploadTime"),
                         jsonObject.getString("videoUri")
                 );
-                postsList.add(post);
-                allPostsList.add(post); // Add to all posts list as well
+                userListManager.addPost(post); // Add to all posts list as well
             }
 
             // Update adapter with the posts
-            postsListAdapter.setPosts(postsList);
+            postsListAdapter.setPosts(userListManager.getAllPosts());
 
         } catch (JSONException e) {
             e.printStackTrace();
