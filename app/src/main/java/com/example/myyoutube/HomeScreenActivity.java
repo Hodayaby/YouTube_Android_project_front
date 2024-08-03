@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
+//yalla
 
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
@@ -104,13 +105,14 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         postsListAdapter = new PostsListAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
-
         // Load videos from JSON file if the lists are empty
         if (userListManager.getAllPosts().isEmpty()) {
+            Toast.makeText(this, "vid33333", Toast.LENGTH_SHORT).show();
             loadVideosFromJSON();
         } else {
             // Update adapter with existing posts
-            postsListAdapter.setPosts(userListManager.getAllPosts());
+            Toast.makeText(this, "vid4444", Toast.LENGTH_SHORT).show();
+            refreshPostList();
         }
 
         // Set up search bar text change listener
@@ -139,7 +141,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
             // If showing favorite videos, reload all videos
             if (showingFavoriteVideos) {
-                postsListAdapter.setPosts(userListManager.getAllPosts());
+                refreshPostList();
                 showingFavoriteVideos = false;
             }
         });
@@ -178,7 +180,12 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         // Update the menu item initially
         updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), ThemeManager.isDarkMode());
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshPostList();
+        Log.d("HomeScreenActivity", "onResume called, refreshed post list");
+    }
     private void setDarkMode(boolean isDarkMode) {
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -220,7 +227,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             }
 
             // Update adapter with the posts
-            postsListAdapter.setPosts(userListManager.getAllPosts());
+            refreshPostList();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -259,6 +266,10 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         } else {
             Toast.makeText(this, "Please login to see your favorite videos", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void refreshPostList() {
+        postsListAdapter.setPosts(userListManager.getAllPosts());
     }
 
     @Override
