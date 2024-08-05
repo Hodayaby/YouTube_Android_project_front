@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import java.io.IOException;
 import java.util.List;
 
 public class VideoViewActivity extends AppCompatActivity {
+
+    private static final int PICK_IMAGE_REQUEST = 2;
 
     private TextView videoTitleTextView;
     private TextView videoAuthorTextView;
@@ -35,7 +39,13 @@ public class VideoViewActivity extends AppCompatActivity {
     private ImageButton dislikeButton;
     private Button addCommentButton;
     private LinearLayout commentsContainer;
-    private ImageButton shareButton; // New line
+    private ImageButton shareButton;
+    private ImageButton editVideoButton;
+    private ImageButton deleteVideoButton;
+
+    private Bitmap imageBitmap;
+    private ImageView previewImageView;
+    private ImageView uploadImageSuccess;
 
     private Post currentPost;
     private UserListManager userListManager;
@@ -65,14 +75,18 @@ public class VideoViewActivity extends AppCompatActivity {
         dislikeButton = findViewById(R.id.dislikeButton);
         addCommentButton = findViewById(R.id.addCommentButton);
         commentsContainer = findViewById(R.id.commentsContainer);
-        shareButton = findViewById(R.id.shareButton); // New line
+        shareButton = findViewById(R.id.shareButton);
+        editVideoButton = findViewById(R.id.editButton);
+        deleteVideoButton = findViewById(R.id.deleteButton);
+        previewImageView = findViewById(R.id.previewImage);
+        uploadImageSuccess = findViewById(R.id.uploadImageSuccess);
 
         // Get data from intent
         String videoTitle = getIntent().getStringExtra("videoTitle");
         String videoAuthor = getIntent().getStringExtra("videoAuthor");
         String videoViews = getIntent().getStringExtra("videoViews");
         String videoUploadTime = getIntent().getStringExtra("videoUploadTime");
-        String videoPic = getIntent().getStringExtra("videoPic"); // Change to String
+        String videoPic = getIntent().getStringExtra("videoPic");
         int videoChannelImage = getIntent().getIntExtra("videoChannelImage", 0);
         String videoUri = getIntent().getStringExtra("videoUri");
 
@@ -90,7 +104,7 @@ public class VideoViewActivity extends AppCompatActivity {
         videoView.start();
 
         // Initialize currentPost
-        currentPost = new Post(videoAuthor, videoTitle, videoPic, videoChannelImage, videoViews, videoUploadTime, videoUri); // Use String for imageUri
+        currentPost = new Post(videoAuthor, videoTitle, videoPic, videoChannelImage, videoViews, videoUploadTime, videoUri);
 
         // Check if the post is liked or disliked and update button colors
         updateLikeDislikeButtons();
@@ -130,6 +144,24 @@ public class VideoViewActivity extends AppCompatActivity {
             commentEditText.setVisibility(View.VISIBLE);
             addCommentButton.setVisibility(View.VISIBLE);
         }
+
+        // Set up edit video button click listener
+        editVideoButton.setOnClickListener(v -> {
+            if (currentUser == null || !videoAuthor.equals(currentUser.getUsername())) {
+                Toast.makeText(VideoViewActivity.this, "You cannot edit this video", Toast.LENGTH_SHORT).show();
+            } else {
+                showEditVideoDialog();
+            }
+        });
+
+        // Set up delete video button click listener
+        deleteVideoButton.setOnClickListener(v -> {
+            if (currentUser == null || !videoAuthor.equals(currentUser.getUsername())) {
+                Toast.makeText(VideoViewActivity.this, "You cannot delete this video", Toast.LENGTH_SHORT).show();
+            } else {
+                deleteVideo();
+            }
+        });
     }
 
     private void setDarkMode(boolean isDarkMode) {
@@ -226,7 +258,7 @@ public class VideoViewActivity extends AppCompatActivity {
         ImageView userImageView = commentView.findViewById(R.id.commentUserImage);
         ImageButton editButton = commentView.findViewById(R.id.editCommentButton);
         ImageButton deleteButton = commentView.findViewById(R.id.deleteCommentButton);
-        LinearLayout editDeleteContainer = commentView.findViewById(R.id.editDeleteContainer); // New line
+        LinearLayout editDeleteContainer = commentView.findViewById(R.id.editDeleteContainer);
 
         usernameTextView.setText(comment.getUsername());
         commentTextView.setText(comment.getContent());
@@ -290,5 +322,86 @@ public class VideoViewActivity extends AppCompatActivity {
 
         Intent shareIntent = Intent.createChooser(sendIntent, null);
         startActivity(shareIntent);
+    }
+
+    // Show custom dialog to edit video details
+
+    // Show custom dialog to edit video details
+    private void showEditVideoDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Video");
+
+        View view = getLayoutInflater().inflate(R.layout.edit_video_dialog, null);
+        EditText videoTitleInput = view.findViewById(R.id.editVideoTitle);
+
+        // Set the current video title in the input field
+        videoTitleInput.setText(currentPost.getContent());
+
+        builder.setView(view);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String editedTitle = videoTitleInput.getText().toString();
+
+            if (!TextUtils.isEmpty(editedTitle)) {
+                currentPost.setContent(editedTitle);
+                videoTitleTextView.setText(editedTitle);
+                userListManager.updatePost(currentPost); // Update post in the manager
+                Toast.makeText(VideoViewActivity.this, "Video title updated successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(VideoViewActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+
+
+    // Delete video
+    private void deleteVideo() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Video");
+
+        builder.setMessage("Are you sure you want to delete this video?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            UserListManager.getInstance().removePost(currentPost);
+            Toast.makeText(VideoViewActivity.this, "Video deleted successfully", Toast.LENGTH_SHORT).show();
+
+            // Redirect to home screen
+            Intent intent = new Intent(this, HomeScreenActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
+        builder.setNegativeButton("No", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+
+    // Open image picker to change the thumbnail
+    private void openImagePicker() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
+    }
+
+    // Handle the result of the image picker
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE_REQUEST && data != null) {
+            Uri imageUri = data.getData();
+            try {
+                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                previewImageView.setImageBitmap(imageBitmap);
+                uploadImageSuccess.setVisibility(View.VISIBLE); // Show success indicator
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

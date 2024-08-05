@@ -3,6 +3,7 @@ package com.example.myyoutube;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ public class UserListManager {
         return allPosts;
     }
 
+    // Function to add a new post
     public void addPost(Post post) {
         allPosts.add(0, post);
         User user = getUserByUsername(post.getAuthor());
@@ -71,12 +73,34 @@ public class UserListManager {
         }
     }
 
+    // Function to update an existing post
+    public void updatePost(Post post) {
+        int index = allPosts.indexOf(post);
+        if (index != -1) {
+            allPosts.set(index, post); // Update existing post
+        } else {
+            // Optionally, handle the case where the post does not exist
+            Log.e("UserListManager", "Post not found: " + post.getVideoUri());
+        }
+    }
+
     public void removePost(Post post) {
-        allPosts.remove(post);
+        Log.d("UserListManager", "Removing post: " + post.getVideoUri());
+
+        boolean removed = allPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
+        if (removed) {
+            Log.d("UserListManager", "Post removed: " + post.getVideoUri());
+        } else {
+            Log.d("UserListManager", "Post not found in allPosts: " + post.getVideoUri());
+        }
+
         User user = getUserByUsername(post.getAuthor());
         if (user != null) {
             user.removeUserPost(post);
         }
+
+        // Log the size of the list after removal
+        Log.d("UserListManager", "Total posts after removal: " + allPosts.size());
     }
 
     public String encodeBitmapToBase64(Bitmap bitmap) {

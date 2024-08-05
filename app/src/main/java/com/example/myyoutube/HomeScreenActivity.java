@@ -30,7 +30,6 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
-//yalla
 
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
@@ -38,6 +37,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     public static RecyclerView recyclerView; // Static RecyclerView
     private EditText searchBar;
     private ImageView profileButton;
+    private ImageView profileImage;
     private TextView noResultsText;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -69,6 +69,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         recyclerView = findViewById(R.id.recyclerView);
         searchBar = findViewById(R.id.searchBar);
         profileButton = findViewById(R.id.btnAccount);
+        profileImage = findViewById(R.id.profileImage); // הוספתי שורה זו
         noResultsText = findViewById(R.id.noResultsText);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -90,13 +91,22 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         // Set up floating action button to open UploadVideoActivity
         FloatingActionButton btnAdd = findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeScreenActivity.this, UploadVideoActivity.class);
-            startActivity(intent);
+            // Check if a user is logged in
+            currentUser = userListManager.getCurrentUser();
+            if (currentUser != null) {
+                // If user is logged in, open UploadVideoActivity
+                Intent intent = new Intent(HomeScreenActivity.this, UploadVideoActivity.class);
+                startActivity(intent);
+            } else {
+                // If no user is logged in, show a message
+                Toast.makeText(HomeScreenActivity.this, "Please login to add videos", Toast.LENGTH_SHORT).show();
+            }
         });
 
         Log.d("HomeScreenActivity", "Views initialized");
 
         // Load current user profile image and details
+        updateProfileButtonImage();
         updateUserDetails();
 
         Log.d("HomeScreenActivity", "Profile image and details loaded");
@@ -171,7 +181,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
                 recreate(); // Recreate the activity to apply the new theme
             } else if (id == R.id.nav_logout) {
                 // Handle logout click
-                Toast.makeText(this, "Logout Clicked", Toast.LENGTH_SHORT).show();
+                handleLogout();
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
@@ -180,12 +190,14 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         // Update the menu item initially
         updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), ThemeManager.isDarkMode());
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         refreshPostList();
         Log.d("HomeScreenActivity", "onResume called, refreshed post list");
     }
+
     private void setDarkMode(boolean isDarkMode) {
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -234,14 +246,21 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    private void updateProfileButtonImage() {
+        currentUser = userListManager.getCurrentUser();
+        if (currentUser != null && currentUser.getProfileImage() != null) {
+            profileButton.setImageResource(R.drawable.ic_account);
+        } else {
+            profileButton.setImageResource(R.drawable.ic_noaccount);
+        }
+    }
+
     private void updateUserDetails() {
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null) {
             if (currentUser.getProfileImage() != null) {
                 profileImageView.setImageBitmap(currentUser.getProfileImage());
-                profileButton.setImageBitmap(currentUser.getProfileImage());
-            } else {
-                profileButton.setImageResource(R.drawable.ic_account);
+                profileImage.setImageBitmap(currentUser.getProfileImage());
             }
             if (currentUser.getUsername() != null) {
                 usernameTextView.setText("username: " + currentUser.getUsername());
@@ -253,7 +272,8 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         } else {
             usernameTextView.setText("No user logged in");
             displayNameTextView.setText("Welcome");
-            profileButton.setImageResource(R.drawable.ic_account);
+            profileImageView.setImageResource(R.drawable.ic_account);
+            profileImage.setImageResource(R.drawable.ic_profile);
         }
     }
 
@@ -270,6 +290,25 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
     private void refreshPostList() {
         postsListAdapter.setPosts(userListManager.getAllPosts());
+    }
+
+    private void handleLogout() {
+        // Check if a user is logged in
+        currentUser = userListManager.getCurrentUser();
+        if (currentUser != null) {
+            // Logout the user
+            userListManager.setCurrentUser(null);
+            updateUserDetails();
+            updateProfileButtonImage(); // Update the profile button image as well
+
+            // Navigate to login screen
+            Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish(); // Finish the current activity
+        } else {
+            // Show a message if no user is logged in
+            Toast.makeText(this, "No user is logged in", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

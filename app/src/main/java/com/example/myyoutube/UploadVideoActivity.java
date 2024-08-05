@@ -62,7 +62,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         // Initialize UI components
         videoTitleEditText = findViewById(R.id.uploadVidName);
-        videoDescriptionEditText = findViewById(R.id.videoDes);
+//        videoDescriptionEditText = findViewById(R.id.videoDes);
         uploadVideoButton = findViewById(R.id.uploadVideoBtn);
         uploadImageButton = findViewById(R.id.uploadImageBtn);
         submitUploadButton = findViewById(R.id.submitUploadBtn);
@@ -214,7 +214,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
     private void handleUpload() {
         String videoTitle = videoTitleEditText.getText().toString().trim();
-        String videoDescription = videoDescriptionEditText.getText().toString().trim();
+//        String videoDescription = videoDescriptionEditText.getText().toString().trim();
 
         // Check if the video title is entered
         if (TextUtils.isEmpty(videoTitle)) {
@@ -259,7 +259,13 @@ public class UploadVideoActivity extends AppCompatActivity {
         Log.d(TAG, "Video File Path: " + videoFilePath);
 
         // Create a new Post object with the video details
-        Post newPost = new Post(author, videoDescription, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
+        // assuming you have a method to get the drawable resource id from a Bitmap
+//        int profileImageResourceId = getProfileImageResourceId(currentUser.getProfileImage());
+//        Post newPost = new Post(author, videoTitle, imageUriStr, profileImageResourceId, views, uploadTime, videoFilePath);
+
+// implement the method getProfileImageResourceId(Bitmap bitmap)
+
+       Post newPost = new Post(author, videoTitle, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
 
         // Add the post to the global post list
         Log.d(TAG, "Uploading video: " + videoTitle);

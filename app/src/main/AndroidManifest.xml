@@ -40,7 +40,7 @@
 
         <!-- פעילות ראשית: LoginActivity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".HomeScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,7 +52,7 @@
         <activity android:name=".RegisterActivity" />
 
         <!-- פעילות למסך הבית -->
-        <activity android:name=".HomeScreenActivity" />
+        <activity  android:name=".LoginActivity" />
         <activity android:name=".VideoViewActivity" />
         <activity android:name=".UploadVideoActivity" />
     </application>
