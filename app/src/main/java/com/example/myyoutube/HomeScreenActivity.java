@@ -228,6 +228,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
                 Post post = new Post(
                         jsonObject.getString("author"),
                         jsonObject.getString("content"),
+                        jsonObject.getString("description"),
                         "android.resource://com.example.myyoutube/drawable/" + jsonObject.getString("thumbnail"), // Using string path for image
                         getResources().getIdentifier(jsonObject.getString("channelImage"), "drawable", getPackageName()),
                         jsonObject.getString("views"),

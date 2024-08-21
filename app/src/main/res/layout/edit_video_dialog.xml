@@ -7,7 +7,14 @@
     <EditText
         android:id="@+id/editVideoTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="63dp"
         android:hint="Video Title"
+        android:minHeight="48dp" />
+
+    <EditText
+        android:id="@+id/editVideoDesc"
+        android:layout_width="match_parent"
+        android:layout_height="69dp"
+        android:hint="Video Desciption"
         android:minHeight="48dp" />
 </LinearLayout>

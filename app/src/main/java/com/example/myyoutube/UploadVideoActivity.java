@@ -45,6 +45,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
     // UI components
     private EditText videoTitleEditText;
+    private EditText videoDescEditText;
     private Button uploadVideoButton;
     private Button uploadImageButton;
     private Button submitUploadButton;
@@ -64,6 +65,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         // Initialize UI components
         videoTitleEditText = findViewById(R.id.uploadVidName);
+        videoDescEditText = findViewById(R.id.uploadVidDesc );
         uploadVideoButton = findViewById(R.id.uploadVideoBtn);
         uploadImageButton = findViewById(R.id.uploadImageBtn);
         submitUploadButton = findViewById(R.id.submitUploadBtn);
@@ -221,13 +223,20 @@ public class UploadVideoActivity extends AppCompatActivity {
 
     // Handle the submission of the upload
     private void handleUpload() {
-        String videoTitle = videoTitleEditText.getText().toString().trim();
+            String videoTitle = videoTitleEditText.getText().toString().trim();
+            String videoDescription = videoDescEditText.getText().toString().trim();
 
-        // Check if the video title is entered
-        if (TextUtils.isEmpty(videoTitle)) {
-            Toast.makeText(this, "Please enter a video title", Toast.LENGTH_SHORT).show();
-            return;
-        }
+            // Check if the video title is entered
+            if (TextUtils.isEmpty(videoTitle)) {
+                Toast.makeText(this, "Please enter a video title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check if the video description is entered
+            if (TextUtils.isEmpty(videoDescription)) {
+                Toast.makeText(this, "Please enter a video description", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
         // Check if the video is selected
         if (videoUri == null) {
@@ -269,7 +278,8 @@ public class UploadVideoActivity extends AppCompatActivity {
         Log.d(TAG, "Video File Path: " + videoFilePath);
 
         // Create a new Post object with the video details
-        Post newPost = new Post(author, videoTitle, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
+        Post newPost = new Post(author, videoTitle, videoDescription, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
+
 
         // Add the post to the global post list
         Log.d(TAG, "Uploading video: " + videoTitle);

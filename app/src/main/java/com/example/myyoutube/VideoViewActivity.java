@@ -31,6 +31,7 @@ public class VideoViewActivity extends AppCompatActivity {
 
     private TextView videoTitleTextView;
     private TextView videoAuthorTextView;
+    private TextView videoDescTextView;
     private TextView videoViewsTextView;
     private ImageView videoChannelImageView;
     private VideoView videoView;
@@ -68,6 +69,7 @@ public class VideoViewActivity extends AppCompatActivity {
         videoTitleTextView = findViewById(R.id.videoTitle);
         videoAuthorTextView = findViewById(R.id.videoArtist);
         videoViewsTextView = findViewById(R.id.videoDetails);
+        videoDescTextView = findViewById(R.id.videoDesc);
         videoChannelImageView = findViewById(R.id.videoChannelImage);
         videoView = findViewById(R.id.videoView);
         commentEditText = findViewById(R.id.commentBox);
@@ -84,6 +86,7 @@ public class VideoViewActivity extends AppCompatActivity {
         // Get data from intent
         String videoTitle = getIntent().getStringExtra("videoTitle");
         String videoAuthor = getIntent().getStringExtra("videoAuthor");
+        String videoDesc = getIntent().getStringExtra("videoDescription");
         String videoViews = getIntent().getStringExtra("videoViews");
         String videoUploadTime = getIntent().getStringExtra("videoUploadTime");
         String videoPic = getIntent().getStringExtra("videoPic");
@@ -94,6 +97,7 @@ public class VideoViewActivity extends AppCompatActivity {
         // Set data to views
         videoTitleTextView.setText(videoTitle);
         videoAuthorTextView.setText(videoAuthor);
+        videoDescTextView.setText(videoDesc);
         videoViewsTextView.setText(videoViews + " • " + videoUploadTime);
         videoChannelImageView.setImageResource(videoChannelImage);
 
@@ -105,7 +109,7 @@ public class VideoViewActivity extends AppCompatActivity {
         videoView.start();
 
         // Initialize currentPost
-        currentPost = new Post(videoAuthor, videoTitle, videoPic, videoChannelImage, videoViews, videoUploadTime, videoUri);
+        currentPost = new Post(videoAuthor, videoTitle, videoDesc, videoPic, videoChannelImage, videoViews, videoUploadTime, videoUri);
 
         // Check if the post is liked or disliked and update button colors
         updateLikeDislikeButtons();
@@ -327,35 +331,40 @@ public class VideoViewActivity extends AppCompatActivity {
 
     // Show custom dialog to edit video details
 
-    // Show custom dialog to edit video details
     private void showEditVideoDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Video");
 
         View view = getLayoutInflater().inflate(R.layout.edit_video_dialog, null);
         EditText videoTitleInput = view.findViewById(R.id.editVideoTitle);
+        EditText videoDescInput = view.findViewById(R.id.editVideoDesc);
 
-        // Set the current video title in the input field
+        // Set the current video title and description in the input fields
         videoTitleInput.setText(currentPost.getContent());
+        videoDescInput.setText(currentPost.getDescription());
 
         builder.setView(view);
 
         builder.setPositiveButton("Save", (dialog, which) -> {
             String editedTitle = videoTitleInput.getText().toString();
+            String editedDesc = videoDescInput.getText().toString();
 
-            if (!TextUtils.isEmpty(editedTitle)) {
+            if (!TextUtils.isEmpty(editedTitle) && !TextUtils.isEmpty(editedDesc)) {
                 currentPost.setContent(editedTitle);
+                currentPost.setDescription(editedDesc);
                 videoTitleTextView.setText(editedTitle);
+                videoDescTextView.setText(editedDesc);
                 userListManager.updatePost(currentPost); // Update post in the manager
-                Toast.makeText(VideoViewActivity.this, "Video title updated successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VideoViewActivity.this, "Video details updated successfully", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(VideoViewActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VideoViewActivity.this, "Title and description cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
+
 
 
 

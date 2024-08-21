@@ -21,6 +21,7 @@ public class Post {
 
     private String author;
     private String content;
+    private String description;
     private String imageUri;
     private int channelImage;
     private String channelImageBase64;
@@ -36,9 +37,10 @@ public class Post {
     }
 
     // Constructor with drawable resource for channel image
-    public Post(String author, String content, String imageUri, int channelImage, String views, String uploadTime, String videoUri) {
+    public Post(String author, String content,String description, String imageUri, int channelImage, String views, String uploadTime, String videoUri) {
         this.author = author;
         this.content = content;
+        this.description = description;
         this.imageUri = imageUri;
         this.channelImage = channelImage;
         this.views = views;
@@ -48,9 +50,10 @@ public class Post {
     }
 
     // Constructor with Bitmap for channel image (converted to Base64)
-    public Post(String author, String content, String imageUri, Bitmap channelImageBitmap, String views, String uploadTime, String videoUri) {
+    public Post(String author, String content,String description, String imageUri, Bitmap channelImageBitmap, String views, String uploadTime, String videoUri) {
         this.author = author;
         this.content = content;
+        this.description = description;
         this.imageUri = imageUri;
         this.channelImageBase64 = bitmapToBase64(channelImageBitmap);
         this.views = views;
@@ -69,6 +72,8 @@ public class Post {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public String getImageUri() { return imageUri; }
     public void setImageUri(String imageUri) { this.imageUri = imageUri; }
 

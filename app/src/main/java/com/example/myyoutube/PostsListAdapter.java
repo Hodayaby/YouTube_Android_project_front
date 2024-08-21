@@ -76,6 +76,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
                 Intent intent = new Intent(context, VideoViewActivity.class);
                 intent.putExtra("videoTitle", current.getContent());
                 intent.putExtra("videoAuthor", current.getAuthor());
+                intent.putExtra("videoDescription", current.getDescription()); // Pass the video description
                 intent.putExtra("videoViews", current.getViews());
                 intent.putExtra("videoUploadTime", current.getUploadTime());
                 intent.putExtra("videoPic", current.getImageUri());
