@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -33,8 +32,9 @@ import java.util.Scanner;
 
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
-    public static PostsListAdapter postsListAdapter; // Static adapter
-    public static RecyclerView recyclerView; // Static RecyclerView
+    // Declare UI elements and adapters
+    public static PostsListAdapter postsListAdapter;
+    public static RecyclerView recyclerView;
     private EditText searchBar;
     private ImageView profileButton;
     private ImageView profileImage;
@@ -49,7 +49,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
     private UserListManager userListManager;
     private User currentUser;
-    private boolean showingFavoriteVideos = false; // To track if we are showing favorite videos
+    private boolean showingFavoriteVideos = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,18 +58,17 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
 
+        // Set the content view and log the activity start
         setContentView(R.layout.activity_homescreen);
-        Log.d("HomeScreenActivity", "HomeScreenActivity Started");
-        Toast.makeText(this, "HomeScreenActivity Started", Toast.LENGTH_SHORT).show();
 
-        // Initialize UserListManager
+        // Initialize UserListManager instance
         userListManager = UserListManager.getInstance();
 
         // Initialize views
         recyclerView = findViewById(R.id.recyclerView);
         searchBar = findViewById(R.id.searchBar);
         profileButton = findViewById(R.id.btnAccount);
-        profileImage = findViewById(R.id.profileImage); // הוספתי שורה זו
+        profileImage = findViewById(R.id.profileImage);
         noResultsText = findViewById(R.id.noResultsText);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -80,12 +79,12 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         displayNameTextView = headerView.findViewById(R.id.nav_greeting);
         profileImageView = headerView.findViewById(R.id.nav_profile_image);
 
-        // Set up drawer toggle
+        // Set up drawer toggle for navigation
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        // Set up menu button click listener to open drawer
+        // Set up menu button click listener to open the navigation drawer
         findViewById(R.id.menuButton).setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         // Set up floating action button to open UploadVideoActivity
@@ -103,29 +102,27 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             }
         });
 
-        Log.d("HomeScreenActivity", "Views initialized");
 
         // Load current user profile image and details
         updateProfileButtonImage();
         updateUserDetails();
 
-        Log.d("HomeScreenActivity", "Profile image and details loaded");
 
-        // Initialize adapter and recyclerView
+        // Initialize adapter and RecyclerView
         postsListAdapter = new PostsListAdapter(this, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
+
         // Load videos from JSON file if the lists are empty
         if (userListManager.getAllPosts().isEmpty()) {
-            Toast.makeText(this, "vid33333", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Loading videos...", Toast.LENGTH_SHORT).show();
             loadVideosFromJSON();
         } else {
             // Update adapter with existing posts
-            Toast.makeText(this, "vid4444", Toast.LENGTH_SHORT).show();
             refreshPostList();
         }
 
-        // Set up search bar text change listener
+        // Set up search bar text change listener to filter posts based on search input
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -173,31 +170,31 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             if (id == R.id.nav_favorite_videos) {
                 showFavoriteVideos();
             } else if (id == R.id.nav_dark_mode) {
-                // Handle dark mode click
+                // Handle dark mode toggle
                 boolean isDarkMode = !ThemeManager.isDarkMode();
                 ThemeManager.setDarkMode(isDarkMode);
                 setDarkMode(isDarkMode);
                 updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), isDarkMode); // Update the menu item
                 recreate(); // Recreate the activity to apply the new theme
             } else if (id == R.id.nav_logout) {
-                // Handle logout click
+                // Handle logout action
                 handleLogout();
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
-        // Update the menu item initially
+        // Update the dark mode menu item title initially
         updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), ThemeManager.isDarkMode());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshPostList();
-        Log.d("HomeScreenActivity", "onResume called, refreshed post list");
+        refreshPostList(); // Refresh the post list on resume
     }
 
+    // Set dark mode based on the current theme
     private void setDarkMode(boolean isDarkMode) {
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -206,6 +203,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Update the menu title based on dark mode status
     private void updateMenuTitle(MenuItem menuItem, boolean isDarkMode) {
         if (isDarkMode) {
             menuItem.setTitle("Light Mode");
@@ -216,6 +214,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Load videos from JSON file located in the resources
     private void loadVideosFromJSON() {
         try {
             // Load JSON file from resources
@@ -246,6 +245,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Update the profile button image based on the current user's status
     private void updateProfileButtonImage() {
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null && currentUser.getProfileImage() != null) {
@@ -255,6 +255,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Update user details in the navigation header
     private void updateUserDetails() {
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null) {
@@ -277,6 +278,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Show favorite videos of the current user
     private void showFavoriteVideos() {
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null && currentUser.getUsername() != null) {
@@ -288,10 +290,12 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Refresh the post list with all posts
     private void refreshPostList() {
         postsListAdapter.setPosts(userListManager.getAllPosts());
     }
 
+    // Handle user logout action
     private void handleLogout() {
         // Check if a user is logged in
         currentUser = userListManager.getCurrentUser();
@@ -311,6 +315,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         }
     }
 
+    // Callback when posts are filtered
     @Override
     public void onPostsFiltered(int count) {
         if (count == 0) {

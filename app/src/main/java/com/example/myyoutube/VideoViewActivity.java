@@ -90,6 +90,7 @@ public class VideoViewActivity extends AppCompatActivity {
         int videoChannelImage = getIntent().getIntExtra("videoChannelImage", 0);
         String videoUri = getIntent().getStringExtra("videoUri");
 
+
         // Set data to views
         videoTitleTextView.setText(videoTitle);
         videoAuthorTextView.setText(videoAuthor);

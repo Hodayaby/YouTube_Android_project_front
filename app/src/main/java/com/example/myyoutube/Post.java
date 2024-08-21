@@ -21,9 +21,9 @@ public class Post {
 
     private String author;
     private String content;
-    private String imageUri; // שינוי ל-String כדי לתמוך ב-URI של תמונה
-    private int channelImage; // עדיין תומך ב-int עבור מזהה תמונה
-    private String profileImageBase64; // תמונה של הערוץ כ-Base64 string
+    private String imageUri;
+    private int channelImage;
+    private String channelImageBase64;
     private String views;
     private String uploadTime;
     private String videoUri;
@@ -31,10 +31,11 @@ public class Post {
     // Static map to store comments for each post
     private static Map<String, List<Comment>> commentsMap = new HashMap<>();
 
+    // Default constructor
     public Post() {
-        // Default constructor
     }
 
+    // Constructor with drawable resource for channel image
     public Post(String author, String content, String imageUri, int channelImage, String views, String uploadTime, String videoUri) {
         this.author = author;
         this.content = content;
@@ -46,11 +47,12 @@ public class Post {
         commentsMap.putIfAbsent(videoUri, new ArrayList<>());
     }
 
-    public Post(String author, String content, String imageUri, Bitmap profileImageBitmap, String views, String uploadTime, String videoUri) {
+    // Constructor with Bitmap for channel image (converted to Base64)
+    public Post(String author, String content, String imageUri, Bitmap channelImageBitmap, String views, String uploadTime, String videoUri) {
         this.author = author;
         this.content = content;
         this.imageUri = imageUri;
-        this.profileImageBase64 = bitmapToBase64(profileImageBitmap);
+        this.channelImageBase64 = bitmapToBase64(channelImageBitmap);
         this.views = views;
         this.uploadTime = uploadTime;
         this.videoUri = videoUri;
@@ -73,8 +75,8 @@ public class Post {
     public int getChannelImage() { return channelImage; }
     public void setChannelImage(int channelImage) { this.channelImage = channelImage; }
 
-    public String getProfileImageBase64() { return profileImageBase64; }
-    public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
+    public String getChannelImageBase64() { return channelImageBase64; }
+    public void setChannelImageBase64(String channelImageBase64) { this.channelImageBase64 = channelImageBase64; }
 
     public String getViews() { return views; }
     public void setViews(String views) { this.views = views; }
@@ -85,17 +87,17 @@ public class Post {
     public String getVideoUri() { return videoUri; }
     public void setVideoUri(String videoUri) { this.videoUri = videoUri; }
 
-    // Get comments from the static map
+    // Get comments associated with this post from the static map
     public List<Comment> getComments() {
         return commentsMap.get(videoUri);
     }
 
-    // Add a comment to the static map
+    // Add a comment to this post in the static map
     public void addComment(Comment comment) {
         commentsMap.get(videoUri).add(comment);
     }
 
-    // Remove a comment from the static map
+    // Remove a comment from this post in the static map
     public void removeComment(Comment comment) {
         commentsMap.get(videoUri).remove(comment);
     }
@@ -107,6 +109,8 @@ public class Post {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
+
+    // Override equals method to compare posts based on videoUri
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,8 +119,10 @@ public class Post {
         return videoUri.equals(post.videoUri);
     }
 
+    // Override hashCode method to generate hash based on videoUri
     @Override
     public int hashCode() {
         return Objects.hash(videoUri);
     }
+
 }

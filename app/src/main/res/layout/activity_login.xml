@@ -15,7 +15,7 @@
         android:layout_height="287dp"
         android:layout_gravity="center"
         android:layout_marginBottom="32dp"
-        android:src="@drawable/youtube_logo" /> <!-- This will switch automatically -->
+        android:src="@drawable/youtube_logo" />
 
     <EditText
         android:id="@+id/username"

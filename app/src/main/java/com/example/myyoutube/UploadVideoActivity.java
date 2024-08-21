@@ -1,6 +1,5 @@
 package com.example.myyoutube;
 
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -37,20 +36,23 @@ import java.io.OutputStream;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
+    // Request codes for video and image picking, and permissions
     private static final int PICK_VIDEO_REQUEST = 1;
     private static final int PICK_IMAGE_REQUEST = 2;
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
     private static final int GALLERY_PERMISSION_REQUEST_CODE = 102;
     private static final String TAG = "UploadVideoActivity";
 
+    // UI components
     private EditText videoTitleEditText;
-    private EditText videoDescriptionEditText;
     private Button uploadVideoButton;
     private Button uploadImageButton;
     private Button submitUploadButton;
     private ImageView previewImageView;
     private ImageView uploadVideoSuccess;
     private ImageView uploadImageSuccess;
+
+    // Variables for storing selected video URI and image bitmap
     private Uri videoUri;
     private Bitmap imageBitmap;
     private User currentUser;
@@ -62,7 +64,6 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         // Initialize UI components
         videoTitleEditText = findViewById(R.id.uploadVidName);
-//        videoDescriptionEditText = findViewById(R.id.videoDes);
         uploadVideoButton = findViewById(R.id.uploadVideoBtn);
         uploadImageButton = findViewById(R.id.uploadImageBtn);
         submitUploadButton = findViewById(R.id.submitUploadBtn);
@@ -95,6 +96,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Method to check required permissions
     private boolean checkPermissions() {
         if (Build.VERSION.SDK_INT >= 33) {
             boolean readImagesGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
@@ -115,6 +117,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Method to request necessary permissions
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= 33) {
             Log.d(TAG, "Requesting permissions for Android 13+");
@@ -129,6 +132,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Show options to upload a video (either record or choose from gallery)
     private void showVideoUploadOptions() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Upload Video")
@@ -136,7 +140,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            // Take video
+                            // Take video option
                             if (ContextCompat.checkSelfPermission(UploadVideoActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                 Log.d(TAG, "Camera permission granted, opening camera");
                                 Intent cameraIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -146,7 +150,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                                 ActivityCompat.requestPermissions(UploadVideoActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                             }
                         } else {
-                            // Choose from gallery
+                            // Choose from gallery option
                             if (Build.VERSION.SDK_INT >= 33) {
                                 if (ContextCompat.checkSelfPermission(UploadVideoActivity.this, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
                                     Log.d(TAG, "READ_MEDIA_VIDEO permission not granted, requesting permission");
@@ -170,12 +174,14 @@ public class UploadVideoActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Launch intent to pick a video from the gallery
     private void dispatchPickVideoIntent() {
         Log.d(TAG, "Dispatching pick video intent");
         Intent pickVideoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(pickVideoIntent, PICK_VIDEO_REQUEST);
     }
 
+    // Open the image picker to choose an image
     private void openImagePicker() {
         Log.d(TAG, "Opening image picker");
         Intent intent = new Intent();
@@ -184,6 +190,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
     }
 
+    // Handle the result from picking a video or image
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -212,9 +219,9 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Handle the submission of the upload
     private void handleUpload() {
         String videoTitle = videoTitleEditText.getText().toString().trim();
-//        String videoDescription = videoDescriptionEditText.getText().toString().trim();
 
         // Check if the video title is entered
         if (TextUtils.isEmpty(videoTitle)) {
@@ -234,11 +241,12 @@ public class UploadVideoActivity extends AppCompatActivity {
             return;
         }
 
-        // Generate a unique file name for the video
-        long timevid= System.currentTimeMillis();
-        String vidName = "video_"  + timevid +  ".mp4";
-        String picName = "pic_"  + timevid +  ".png";
+        // Generate a unique file name for the video and image
+        long timevid = System.currentTimeMillis();
+        String vidName = "video_" + timevid + ".mp4";
+        String picName = "pic_" + timevid + ".png";
 
+        // Save video file
         File vidFile = vidToFile(videoUri, vidName);
 
         // Check if video file creation was successful
@@ -247,32 +255,30 @@ public class UploadVideoActivity extends AppCompatActivity {
             return;
         }
 
+        // Get the file paths
         String videoFilePath = vidFile.getAbsolutePath();
-        Uri imageUri = saveBitmapToFile(UploadVideoActivity.this, imageBitmap,picName);
-       String imageUriStr = imageUri.toString();
+        Uri imageUri = saveBitmapToFile(UploadVideoActivity.this, imageBitmap, picName);
+        String imageUriStr = imageUri.toString();
+
         // Get user details
         String author = currentUser.getUsername();
         String uploadTime = "Just now";
         String views = "0 views";
 
-        // Log the video file path to debug
+        // Log the video file path for debugging
         Log.d(TAG, "Video File Path: " + videoFilePath);
 
         // Create a new Post object with the video details
-        // assuming you have a method to get the drawable resource id from a Bitmap
-//        int profileImageResourceId = getProfileImageResourceId(currentUser.getProfileImage());
-//        Post newPost = new Post(author, videoTitle, imageUriStr, profileImageResourceId, views, uploadTime, videoFilePath);
-
-// implement the method getProfileImageResourceId(Bitmap bitmap)
-
-       Post newPost = new Post(author, videoTitle, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
+        Post newPost = new Post(author, videoTitle, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
 
         // Add the post to the global post list
         Log.d(TAG, "Uploading video: " + videoTitle);
         UserListManager.getInstance().addPost(newPost);
         Log.d(TAG, "Video uploaded successfully: " + videoTitle);
+
         // Notify the user of successful upload
         Toast.makeText(this, "Video uploaded successfully!", Toast.LENGTH_SHORT).show();
+
         // Clear the image preview to release memory
         previewImageView.setImageURI(null);
         uploadVideoSuccess.setVisibility(View.GONE);
@@ -281,12 +287,12 @@ public class UploadVideoActivity extends AppCompatActivity {
         // Redirect to home screen
         Intent intent = new Intent(this, HomeScreenActivity.class);
         startActivity(intent);
-
         finish();
     }
 
+    // Method to save bitmap to a file
     public Uri saveBitmapToFile(Context context, Bitmap bitmap, String fileName) {
-        // Get the directory for the app's private pictures directory.
+        // Get the directory for the app's private pictures directory
         File directory = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myyoutube");
 
         if (!directory.exists()) {
@@ -316,6 +322,8 @@ public class UploadVideoActivity extends AppCompatActivity {
         // Return the URI of the file
         return FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
     }
+
+    // Method to convert video URI to file
     private File vidToFile(Uri videoUri, String vidName) {
         try {
             Log.d(TAG, "Checking permissions before converting video URI to file");
@@ -344,6 +352,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
     }
 
+    // Handle the result of permission requests
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

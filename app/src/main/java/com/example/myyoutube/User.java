@@ -3,7 +3,6 @@ package com.example.myyoutube;
 import android.graphics.Bitmap;
 import java.util.ArrayList;
 import java.util.List;
-//יאללה
 public class User {
     private String username;
     private String password;

@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    // Declare UI elements
     private EditText registerUsernameEditText;
     private EditText registerPasswordEditText;
     private EditText registerConfirmPasswordEditText;
@@ -38,9 +39,12 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private Bitmap selectedBitmap;
     private UserListManager userListManager;
+
+    // Constants for image requests and permissions
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int CAPTURE_IMAGE_REQUEST = 2;
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,9 +52,10 @@ public class RegisterActivity extends AppCompatActivity {
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
 
+        // Set the layout for the activity
         setContentView(R.layout.activity_register);
 
-        // Initialize UserListManager
+        // Initialize UserListManager instance
         userListManager = UserListManager.getInstance();
 
         // Initialize UI elements
@@ -112,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            // Take photo
+                            // Take photo option selected
                             if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 startActivityForResult(cameraIntent, CAPTURE_IMAGE_REQUEST);
@@ -120,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
                             }
                         } else {
-                            // Choose from gallery
+                            // Choose from gallery option selected
                             Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                             startActivityForResult(pickPhotoIntent, PICK_IMAGE_REQUEST);
                         }
@@ -129,6 +134,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .show();
     }
 
+    // Handle activity results for image picking or capturing
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -153,8 +159,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-
-
+    // Handle permission results for camera access
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -240,7 +245,7 @@ public class RegisterActivity extends AppCompatActivity {
         userListManager.addUser(user);
     }
 
-    // Method to encode Bitmap to String
+    // Method to encode Bitmap to String (Base64)
     private String encodeBitmapToString(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
@@ -248,13 +253,13 @@ public class RegisterActivity extends AppCompatActivity {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    // Method to decode String to Bitmap
+    // Method to decode String (Base64) to Bitmap
     private Bitmap decodeStringToBitmap(String encodedString) {
         byte[] decodedByte = Base64.decode(encodedString, 0);
         return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
-    // Method to check if password is valid (contains letters and numbers)
+    // Method to check if password is valid (contains both letters and numbers)
     private boolean isPasswordValid(String password) {
         boolean hasLetter = false;
         boolean hasDigit = false;
@@ -270,6 +275,7 @@ public class RegisterActivity extends AppCompatActivity {
         return hasLetter && hasDigit;
     }
 
+    // Set dark mode based on current theme
     private void setDarkMode(boolean isDarkMode) {
         if (isDarkMode) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
