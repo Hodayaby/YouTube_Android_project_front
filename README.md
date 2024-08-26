@@ -17,3 +17,23 @@ Understanding the new Android development environment was another significant hu
 We needed to deeply understand how to handle permissions and convert between different formats. 
 Additionally, organizing and maintaining order in our project was essential.
 Effective teamwork and regular communication helped us overcome these obstacles and keep the project on track.
+Here are some pictures of the project :
+all the pictures below are examples. of course there is more functions and more details in the app.
+Picture of the screens:
+![1](https://github.com/user-attachments/assets/ac3691a7-5796-4d2c-966b-f2b550ff223e)
+![2](https://github.com/user-attachments/assets/6a7f88b6-fc22-4778-86b4-c13990e8b52c)
+![3](https://github.com/user-attachments/assets/bea99d89-800e-484e-a71a-905040cfdf01)
+example user try to login : 
+![4](https://github.com/user-attachments/assets/3095b924-935b-4c6f-891d-2568b641f634)
+![5](https://github.com/user-attachments/assets/fc520510-d59c-4167-8e29-a954ef921f6f)
+![6](https://github.com/user-attachments/assets/2c409db4-4d0e-4fd6-8523-376ca9d774ee)
+![7](https://github.com/user-attachments/assets/1caffc90-e5dc-4aee-819b-36c934b1fafb)
+Dark mode:
+![7 1](https://github.com/user-attachments/assets/fa2da5d6-cc4e-4e97-a054-c7c528d3f58e)
+![7 2](https://github.com/user-attachments/assets/846b4c9e-507c-4c6c-82a0-dad09a376b25)
+![7 3](https://github.com/user-attachments/assets/31267f44-9c52-4a69-86f2-7720694379e9)
+![11111](https://github.com/user-attachments/assets/3f59ec95-aa89-43c8-926e-49c100dfbc07)
+Video actions: 
+
+
+
