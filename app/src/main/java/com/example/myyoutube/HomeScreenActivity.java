@@ -102,11 +102,9 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             }
         });
 
-
         // Load current user profile image and details
         updateProfileButtonImage();
         updateUserDetails();
-
 
         // Initialize adapter and RecyclerView
         postsListAdapter = new PostsListAdapter(this, this);
@@ -160,6 +158,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
         // Set up login button click listener
         findViewById(R.id.btnAccount).setOnClickListener(v -> {
+            searchBar.setText(""); // מאפס את תיבת החיפוש לפני מעבר למסך ההתחברות
             Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
             startActivity(intent);
         });
@@ -191,7 +190,8 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     @Override
     protected void onResume() {
         super.onResume();
-        refreshPostList(); // Refresh the post list on resume
+        searchBar.setText("");
+        refreshPostList();
     }
 
     // Set dark mode based on the current theme
@@ -302,6 +302,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null) {
             // Logout the user
+            searchBar.setText("");
             userListManager.setCurrentUser(null);
             updateUserDetails();
             updateProfileButtonImage(); // Update the profile button image as well
