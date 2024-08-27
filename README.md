@@ -1,13 +1,16 @@
 
 # Introduction:
 This repository contains the first phase of the YouTube project developed in Android Studio. The project includes both Android and web components, but this part focuses on the Android app development. The project is a collaboration of Hadas Ben David, Ester Ithaki, Hodaya Ben Yashar.
-# How to Clone and Run the Android App:
+# How to Clone and Run the Android App:(Android studio)
 Clone the repository using the following commands:
 git clone https://github.com/Hodayaby/Android_project.git
 
 git checkout master 
 
-Open the project in Android Studio.
+open "Android_project" directory
+
+sync progect with Gradle files
+
 Build and run the project by clicking on the "Run" button or using the shortcut Shift + F10.
 
 It is recommended to create a new emulator for better performance. You can set up a new emulator in Android Studio by going to Tools > Device Manager > Create Device(API 30,Android 11.0 ("R)) .
