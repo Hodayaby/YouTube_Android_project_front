@@ -5,38 +5,40 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Comment {
-    private String username;
-    private String content;
+    private int id;
+    private String user;
+    private String text;
+
     private String timestamp;
     private String profileImageBase64;
 
     public Comment(String username, String content, String profileImageBase64) {
-        this.username = username;
-        this.content = content;
+        this.user = username;
+        this.text = content;
         this.timestamp = getCurrentTimestamp();
         this.profileImageBase64 = profileImageBase64;
     }
 
     public Comment(String username, String content) {
-        this.username = username;
-        this.content = content;
+        this.user = username;
+        this.text = content;
         this.timestamp = getCurrentTimestamp();
     }
 
     public String getUsername() {
-        return username;
+        return user;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.user = username;
     }
 
     public String getContent() {
-        return content;
+        return text;
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.text = content;
     }
 
     public String getTimestamp() {
