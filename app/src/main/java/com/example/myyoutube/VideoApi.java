@@ -6,6 +6,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -35,5 +36,16 @@ public interface VideoApi {
 
     @POST("/api/tokens")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
+
+    @Multipart
+    @POST("/api/users/{id}/videos")
+    Call<UploadResponse> uploadVideo(
+            @Header("Authorization") String token,
+            @Path("id") int userId,
+            @Part MultipartBody.Part videoFile,
+            @Part MultipartBody.Part thumbnail,
+            @Part("title") RequestBody title,
+            @Part("description") RequestBody description
+    );
 }
 

@@ -14,6 +14,9 @@ public interface VideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertVideos(List<Video> videos);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(Video video);
+
     @Query("SELECT * FROM videos")
     List<Video> getAllVideos();
 

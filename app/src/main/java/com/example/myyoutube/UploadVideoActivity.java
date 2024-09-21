@@ -27,12 +27,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
@@ -58,10 +61,16 @@ public class UploadVideoActivity extends AppCompatActivity {
     private Bitmap imageBitmap;
     private User currentUser;
 
+    private UserViewModel userViewModel;
+    private VideoViewModel videoViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uploadvideo);
+
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        videoViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
 
         // Initialize UI components
         videoTitleEditText = findViewById(R.id.uploadVidName);
@@ -73,16 +82,19 @@ public class UploadVideoActivity extends AppCompatActivity {
         uploadVideoSuccess = findViewById(R.id.uploadVideoSuccess);
         uploadImageSuccess = findViewById(R.id.uploadImageSuccess);
 
-        // Get current logged-in user
-        currentUser = UserListManager.getInstance().getCurrentUser();
-
-        if (currentUser == null) {
-            // If no user is logged in, redirect to login
-            Log.d(TAG, "No user logged in, redirecting to login");
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+        userViewModel.getCurrentUser().observe(this, resource -> {
+            if (resource.isSuccess()) {
+                currentUser = resource.getData();
+            } else {
+                Toast.makeText(UploadVideoActivity.this, "Failed to load current user", Toast.LENGTH_SHORT).show();
+            }
+            if (currentUser == null) {
+                // If no user is logged in, redirect to login
+                Log.d(TAG, "No user logged in, redirecting to login");
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+        });
 
         // Set onClick listeners for buttons
         uploadVideoButton.setOnClickListener(v -> showVideoUploadOptions());
@@ -266,42 +278,53 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         // Get the file paths
         String videoFilePath = vidFile.getAbsolutePath();
-        Uri imageUri = saveBitmapToFile(UploadVideoActivity.this, imageBitmap, picName);
-        String imageUriStr = imageUri.toString();
-
-        // Get user details
-        String author = currentUser.getUsername();
-        String uploadTime = "Just now";
-        String views = "0 views";
+        File imageFile = saveBitmapToFile(UploadVideoActivity.this, imageBitmap, picName);
+        if (imageFile == null) {
+            Toast.makeText(this, "Failed to save image file.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Log the video file path for debugging
         Log.d(TAG, "Video File Path: " + videoFilePath);
-
-        // Create a new Post object with the video details
-        Post newPost = new Post(author, videoTitle, videoDescription, imageUriStr, currentUser.getProfilePicture() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
-
-
-        // Add the post to the global post list
         Log.d(TAG, "Uploading video: " + videoTitle);
-        UserListManager.getInstance().addPost(newPost);
-        Log.d(TAG, "Video uploaded successfully: " + videoTitle);
 
-        // Notify the user of successful upload
-        Toast.makeText(this, "Video uploaded successfully!", Toast.LENGTH_SHORT).show();
+        videoViewModel.uploadVideo(currentUser, vidFile, imageFile, videoTitle, videoDescription).observe(this, resource -> {
+            if (resource.isSuccess() && resource.getData() != null) {
+                Video video = resource.getData();
+                File videoFile = FileType.VIDEO.getFilePath(UploadVideoActivity.this, video);
+                moveFile(vidFile, videoFile);
+                File thumbnailFile = FileType.THUMBNAIL.getFilePath(UploadVideoActivity.this, video);
+                moveFile(imageFile, thumbnailFile);
+                Toast.makeText(UploadVideoActivity.this, "Video uploaded successfully!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Video uploaded successfully: " + videoTitle);
 
-        // Clear the image preview to release memory
-        previewImageView.setImageURI(null);
-        uploadVideoSuccess.setVisibility(View.GONE);
-        uploadImageSuccess.setVisibility(View.GONE);
+                // Clear the image preview to release memory
+                previewImageView.setImageURI(null);
+                uploadVideoSuccess.setVisibility(View.GONE);
+                uploadImageSuccess.setVisibility(View.GONE);
 
-        // Redirect to home screen
-        Intent intent = new Intent(this, HomeScreenActivity.class);
-        startActivity(intent);
-        finish();
+                // Redirect to home screen
+                Intent intent = new Intent(this, HomeScreenActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(UploadVideoActivity.this, resource.getError(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static boolean moveFile(File file1, File file2) {
+        boolean success = file1.renameTo(file2);
+        if (success) {
+            System.out.println("File moved successfully!");
+        } else {
+            System.out.println("Failed to move file.");
+        }
+        return success;
     }
 
     // Method to save bitmap to a file
-    public Uri saveBitmapToFile(Context context, Bitmap bitmap, String fileName) {
+    public File saveBitmapToFile(Context context, Bitmap bitmap, String fileName) {
         // Get the directory for the app's private pictures directory
         File directory = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myyoutube");
 
@@ -330,7 +353,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         }
 
         // Return the URI of the file
-        return FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+        return file;
     }
 
     // Method to convert video URI to file

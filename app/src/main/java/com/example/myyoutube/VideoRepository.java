@@ -12,6 +12,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -171,5 +174,44 @@ public class VideoRepository {
             }
         }).start();
         return liveData;
+    }
+
+    public LiveData<Resource<Video>> uploadVideo(User currentUser, File videoFile, File thumbnail, String title, String description) {
+        MutableLiveData<Resource<Video>> result = new MutableLiveData<>();
+
+        // Prepare video file as Multipart
+        RequestBody requestVideoFile = RequestBody.create(MediaType.parse("video/*"), videoFile);
+        MultipartBody.Part videoPart = MultipartBody.Part.createFormData("videoFile", videoFile.getName(), requestVideoFile);
+
+        // Prepare thumbnail as Multipart
+        RequestBody requestThumbnail = RequestBody.create(MediaType.parse("image/*"), thumbnail);
+        MultipartBody.Part thumbnailPart = MultipartBody.Part.createFormData("thumbnail", thumbnail.getName(), requestThumbnail);
+
+        // Prepare title and description as RequestBody
+        RequestBody requestTitle = RequestBody.create(MediaType.parse("text/plain"), title);
+        RequestBody requestDescription = RequestBody.create(MediaType.parse("text/plain"), description);
+
+        // Make the API call
+        videoApi.uploadVideo(currentUser.getToken(), currentUser.getId(), videoPart, thumbnailPart, requestTitle, requestDescription).enqueue(new Callback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Video video = response.body().getVideo();
+                    new Thread(() -> {
+                        videoDao.insert(video);
+                        result.postValue(Resource.success(video));
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Failed to upload video"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                result.postValue(Resource.error(t.getMessage()));
+            }
+        });
+
+        return result;
     }
 }

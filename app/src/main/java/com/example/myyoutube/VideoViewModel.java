@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import java.io.File;
 import java.util.List;
 
 public class VideoViewModel extends AndroidViewModel {
@@ -30,5 +31,9 @@ public class VideoViewModel extends AndroidViewModel {
 
     public LiveData<Resource<Video>> getVideoById(int id) {
         return videoRepository.getVideoById(id);
+    }
+
+    public LiveData<Resource<Video>> uploadVideo(User currentUser, File videoFile, File thumbnail, String title, String description) {
+        return videoRepository.uploadVideo(currentUser, videoFile, thumbnail, title, description);
     }
 }
