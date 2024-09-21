@@ -85,21 +85,7 @@ public class VideoRepository {
         return videos;
     }
 
-    public LiveData<Resource<Boolean>> downloadFile(Video video, FileType fileType) {
-        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
-
-        // Generate the filename based on the video ID and file type
-        String fileName = video.getId() + "_" + fileType.name();
-        File file = new File(context.getFilesDir(), fileName);
-
-        // Check if the file exists
-        if (file.exists()) {
-            // If the file exists, return true immediately
-            result.setValue(Resource.success(true));
-            return result;
-        }
-
-        String filepath = fileType == FileType.VIDEO ? video.getUrl() : video.getThumbnail();
+    private void downloadFile(MutableLiveData<Resource<Boolean>> result, File file, String filepath) {
         String uploadsUrl = "http://localhost:8000/";
         if (filepath.startsWith(uploadsUrl)) {
             filepath = filepath.substring(uploadsUrl.length());
@@ -130,6 +116,44 @@ public class VideoRepository {
                 result.setValue(Resource.error("Download failed: " + t.getMessage()));
             }
         });
+    }
+
+    public LiveData<Resource<Boolean>> downloadFile(User user) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        // Generate the filename based on the video ID and file type
+        String fileName = user.getId() + "_" + FileType.PROFILE.name();
+        File file = new File(context.getFilesDir(), fileName);
+
+        // Check if the file exists
+        if (file.exists()) {
+            // If the file exists, return true immediately
+            result.setValue(Resource.success(true));
+            return result;
+        }
+
+        String filepath = user.getProfilePicture();
+        downloadFile(result, file, filepath);
+
+        return result;
+    }
+
+    public LiveData<Resource<Boolean>> downloadFile(Video video, FileType fileType) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        // Generate the filename based on the video ID and file type
+        String fileName = video.getId() + "_" + fileType.name();
+        File file = new File(context.getFilesDir(), fileName);
+
+        // Check if the file exists
+        if (file.exists()) {
+            // If the file exists, return true immediately
+            result.setValue(Resource.success(true));
+            return result;
+        }
+
+        String filepath = fileType == FileType.VIDEO ? video.getUrl() : video.getThumbnail();
+        downloadFile(result, file, filepath);
 
         return result;
     }

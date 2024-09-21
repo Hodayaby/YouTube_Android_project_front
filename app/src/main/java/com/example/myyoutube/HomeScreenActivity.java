@@ -1,6 +1,8 @@
 package com.example.myyoutube;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,13 +26,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.InputStream;
+import java.io.File;
 import java.util.List;
-import java.util.Scanner;
 
 public class HomeScreenActivity extends AppCompatActivity implements PostsListAdapter.PostsAdapterListener {
 
@@ -49,26 +46,24 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     private TextView displayNameTextView;
     private ImageView profileImageView;
 
-    private UserListManager userListManager;
     private User currentUser;
     private boolean showingFavoriteVideos = false;
 
     private VideoViewModel videoViewModel;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         videoViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
 
         // Set the content view and log the activity start
         setContentView(R.layout.activity_homescreen);
-
-        // Initialize UserListManager instance
-        userListManager = UserListManager.getInstance();
 
         // Initialize views
         recyclerView = findViewById(R.id.recyclerView);
@@ -97,7 +92,6 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         FloatingActionButton btnAdd = findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(v -> {
             // Check if a user is logged in
-            currentUser = userListManager.getCurrentUser();
             if (currentUser != null) {
                 // If user is logged in, open UploadVideoActivity
                 Intent intent = new Intent(HomeScreenActivity.this, UploadVideoActivity.class);
@@ -108,9 +102,22 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             }
         });
 
-        // Load current user profile image and details
-        updateProfileButtonImage();
-        updateUserDetails();
+        userViewModel.getCurrentUser().observe(this, new Observer<Resource<User>>() {
+            @Override
+            public void onChanged(Resource<User> userResource) {
+                if (userResource.isSuccess()) {
+                    User user = userResource.getData();
+                    if (user != null) {
+                        currentUser = user;
+                    }
+                    // Load current user profile image and details
+                    updateProfileButtonImage();
+                    updateUserDetails();
+                } else {
+                    Toast.makeText(HomeScreenActivity.this, "Failed to load current user", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         // Initialize adapter and RecyclerView
         postsListAdapter = new PostsListAdapter(this, this, videoViewModel);
@@ -228,8 +235,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
     // Update the profile button image based on the current user's status
     private void updateProfileButtonImage() {
-        currentUser = userListManager.getCurrentUser();
-        if (currentUser != null && currentUser.getProfileImage() != null) {
+        if (currentUser != null && currentUser.getProfilePicture() != null) {
             profileButton.setImageResource(R.drawable.ic_account);
         } else {
             profileButton.setImageResource(R.drawable.ic_noaccount);
@@ -238,18 +244,24 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
     // Update user details in the navigation header
     private void updateUserDetails() {
-        currentUser = userListManager.getCurrentUser();
         if (currentUser != null) {
-            if (currentUser.getProfileImage() != null) {
-                profileImageView.setImageBitmap(currentUser.getProfileImage());
-                profileImage.setImageBitmap(currentUser.getProfileImage());
-            }
+            videoViewModel.downloadFile(currentUser).observe(HomeScreenActivity.this, resource -> {
+                if (resource.isSuccess() && resource.getData() != null && resource.getData() == true) {
+                    File file = FileType.PROFILE.getFilePath(HomeScreenActivity.this, currentUser);
+                    Bitmap bmp = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    if (bmp != null) {
+                        profileImageView.setImageBitmap(bmp);
+                        profileImage.setImageBitmap(bmp);
+                        return;
+                    }
+                }
+                profileImageView.setImageResource(R.drawable.ic_account);
+                profileImage.setImageResource(R.drawable.ic_profile);
+            });
+
             if (currentUser.getUsername() != null) {
                 usernameTextView.setText("username: " + currentUser.getUsername());
-            }
-
-            if (currentUser.getDisplayName() != null) {
-                displayNameTextView.setText("Welcome " + currentUser.getDisplayName());
+                displayNameTextView.setText("Welcome " + currentUser.getUsername());
             }
         } else {
             usernameTextView.setText("No user logged in");
@@ -261,9 +273,8 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
     // Show favorite videos of the current user
     private void showFavoriteVideos() {
-        currentUser = userListManager.getCurrentUser();
         if (currentUser != null && currentUser.getUsername() != null) {
-            List<Post> likedPosts = currentUser.getLikedPosts();
+//            List<Post> likedPosts = currentUser.getLikedPosts();
 //            postsListAdapter.setPosts(likedPosts);
             showingFavoriteVideos = true; // Update the flag
         } else {
@@ -274,18 +285,22 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     // Handle user logout action
     private void handleLogout() {
         // Check if a user is logged in
-        currentUser = userListManager.getCurrentUser();
         if (currentUser != null) {
             // Logout the user
             searchBar.setText("");
-            userListManager.setCurrentUser(null);
-            updateUserDetails();
-            updateProfileButtonImage(); // Update the profile button image as well
 
-            // Navigate to login screen
-            Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish(); // Finish the current activity
+            userViewModel.clearCurrentUser().observe(this, new Observer<Resource<Boolean>>() {
+                @Override
+                public void onChanged(Resource<Boolean> booleanResource) {
+                    updateUserDetails();
+                    updateProfileButtonImage(); // Update the profile button image as well
+
+                    // Navigate to login screen
+                    Intent intent = new Intent(HomeScreenActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish(); // Finish the current activity
+                }
+            });
         } else {
             // Show a message if no user is logged in
             Toast.makeText(this, "No user is logged in", Toast.LENGTH_SHORT).show();

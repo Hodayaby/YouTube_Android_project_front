@@ -6,9 +6,12 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -17,19 +20,19 @@ public class LoginActivity extends AppCompatActivity {
     private TextView loginErrorTextView;
     private TextView usernameErrorTextView;
     private TextView passwordErrorTextView;
-    private UserListManager userListManager;
+
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
 
         setContentView(R.layout.activity_login);
-
-        // Initialize UserListManager
-        userListManager = UserListManager.getInstance();
 
         // Initialize UI elements
         usernameEditText = findViewById(R.id.username);
@@ -46,13 +49,20 @@ public class LoginActivity extends AppCompatActivity {
 
             // Validate username and password
             if (validateLogin(username, password)) {
-                // Load current user to UserListManager
-                loadCurrentUser(username);
-
-                // Proceed to HomeScreenActivity
-                Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
-                startActivity(intent);
-                finish(); // Finish LoginActivity to prevent going back to it
+                userViewModel.login(username, password).observe(LoginActivity.this, new Observer<Resource<LoginResponse>>() {
+                    @Override
+                    public void onChanged(Resource<LoginResponse> resource) {
+                        if (resource.isSuccess() && resource.getData() != null) {
+                            Toast.makeText(LoginActivity.this, "Login succeeded", Toast.LENGTH_SHORT).show();
+                            // Proceed to HomeScreenActivity
+                            Intent intent = new Intent(LoginActivity.this, HomeScreenActivity.class);
+                            startActivity(intent);
+                            finish(); // Finish LoginActivity to prevent going back to it
+                        } else {
+                            Toast.makeText(LoginActivity.this, resource.getError(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
@@ -67,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
     // Validate login credentials
     private boolean validateLogin(String username, String password) {
         boolean isValid = true;
-        boolean userExists = false;
 
         // Validate username
         if (TextUtils.isEmpty(username)) {
@@ -88,32 +97,7 @@ public class LoginActivity extends AppCompatActivity {
             passwordErrorTextView.setText("");
         }
 
-        // If both fields are valid, further validation can be added
-        if (isValid) {
-            User user = userListManager.getUserByUsername(username);
-            if (user != null) {
-                userExists = true;
-                if (user.getPassword().equals(password)) {
-                    return true;
-                } else {
-                    passwordErrorTextView.setText("Incorrect password");
-                    return false;
-                }
-            }
-            if (!userExists) {
-                usernameErrorTextView.setText("Username does not exist");
-            }
-        }
-
-        return false;
-    }
-
-    // Load current user details into UserListManager
-    private void loadCurrentUser(String username) {
-        User user = userListManager.getUserByUsername(username);
-        if (user != null) {
-            userListManager.setCurrentUser(user);
-        }
+        return isValid;
     }
 
     private void setDarkMode(boolean isDarkMode) {

@@ -52,25 +52,39 @@ public class VideoViewActivity extends AppCompatActivity {
     private ImageView uploadImageSuccess;
 
     private Video currentPost;
-    private UserListManager userListManager;
     private User currentUser;
 
     private VideoViewModel videoViewModel;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         videoViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+
+        userViewModel.getCurrentUser().observe(this, userResource -> {
+            if (userResource.isSuccess()) {
+                currentUser = userResource.getData();
+            } else {
+                Toast.makeText(VideoViewActivity.this, userResource.getError(), Toast.LENGTH_SHORT).show();
+            }
+
+            // If user is not logged in, hide the comment box
+            if (currentUser == null || currentUser.getUsername() == null) {
+                commentEditText.setVisibility(View.GONE);
+                addCommentButton.setVisibility(View.GONE);
+            } else {
+                commentEditText.setVisibility(View.VISIBLE);
+                addCommentButton.setVisibility(View.VISIBLE);
+            }
+        });
 
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
 
         setContentView(R.layout.activity_video_view);
-
-        // Initialize UserListManager
-        userListManager = UserListManager.getInstance();
-        currentUser = userListManager.getCurrentUser();
 
         // Initialize views
         videoTitleTextView = findViewById(R.id.videoTitle);
@@ -159,15 +173,6 @@ public class VideoViewActivity extends AppCompatActivity {
                 shareVideo();
             }
         });
-
-        // If user is not logged in, hide the comment box
-        if (currentUser == null || currentUser.getUsername() == null) {
-            commentEditText.setVisibility(View.GONE);
-            addCommentButton.setVisibility(View.GONE);
-        } else {
-            commentEditText.setVisibility(View.VISIBLE);
-            addCommentButton.setVisibility(View.VISIBLE);
-        }
 
         // Set up edit video button click listener
         editVideoButton.setOnClickListener(v -> {

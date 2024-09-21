@@ -278,7 +278,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         Log.d(TAG, "Video File Path: " + videoFilePath);
 
         // Create a new Post object with the video details
-        Post newPost = new Post(author, videoTitle, videoDescription, imageUriStr, currentUser.getProfileImage() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
+        Post newPost = new Post(author, videoTitle, videoDescription, imageUriStr, currentUser.getProfilePicture() != null ? R.drawable.ic_profile : 0, views, uploadTime, videoFilePath);
 
 
         // Add the post to the global post list

@@ -19,10 +19,13 @@ import retrofit2.Response;
 public class UserRepository {
     private final Context context;
     private VideoApi videoApi;
+    private UserDao userDao;
 
     public UserRepository(Context context) {
         this.context = context;
         videoApi = RetrofitClient.getRetrofitInstance().create(VideoApi.class);
+        AppDatabase appDatabase = DatabaseClient.getInstance(context).getAppDatabase();
+        userDao = appDatabase.userDao();
     }
 
     public LiveData<Resource<Boolean>> registerUser(String username, String password, Bitmap profilePicture) {
@@ -58,6 +61,68 @@ public class UserRepository {
                 result.postValue(new Resource<>(false, t.getMessage()));
             }
         });
+
+        return result;
+    }
+
+    public LiveData<Resource<LoginResponse>> login(String username, String password) {
+        MutableLiveData<Resource<LoginResponse>> result = new MutableLiveData<>();
+
+        LoginRequest loginRequest = new LoginRequest(username, password);
+        videoApi.login(loginRequest).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    LoginResponse loginResponse = response.body();
+
+                    new Thread(() -> {
+                        User user = loginResponse.getUser();
+                        user.setToken(loginResponse.getToken());
+                        userDao.insertUser(user);
+
+                        result.postValue(Resource.success(response.body()));
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Invalid username or password"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                result.postValue(Resource.error("Login failed: " + t.getMessage()));
+            }
+        });
+
+        return result;
+    }
+
+    public LiveData<Resource<User>> getCurrentUser() {
+        MutableLiveData<Resource<User>> result = new MutableLiveData<>();
+
+        new Thread(() -> {
+            try {
+                User userWithToken = userDao.getUserWithToken();
+                result.postValue(Resource.success(userWithToken));
+            } catch (Exception e) {
+                result.postValue(Resource.error(e.getMessage()));
+            }
+        }).start();
+
+        return result;
+    }
+
+
+    public LiveData<Resource<Boolean>> clearCurrentUser() {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        new Thread(() -> {
+            try {
+                userDao.deleteUserWithToken();
+                result.postValue(Resource.success(true));
+            } catch (Exception e) {
+                result.postValue(Resource.error(e.getMessage()));
+            }
+        }).start();
 
         return result;
     }

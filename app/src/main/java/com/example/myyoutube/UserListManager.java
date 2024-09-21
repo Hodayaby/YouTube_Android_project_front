@@ -82,11 +82,11 @@ public class UserListManager {
 
     // Method to add a new post
     public void addPost(Post post) {
-        allPosts.add(0, post); // Add the post to the beginning of the list
-        User user = getUserByUsername(post.getAuthor());
-        if (user != null) {
-            user.addUserPost(post); // Add the post to the user's list of posts
-        }
+//        allPosts.add(0, post); // Add the post to the beginning of the list
+//        User user = getUserByUsername(post.getAuthor());
+//        if (user != null) {
+//            user.addUserPost(post); // Add the post to the user's list of posts
+//        }
     }
 
     // Method to update an existing post
@@ -102,22 +102,22 @@ public class UserListManager {
 
     // Method to remove a post
     public void removePost(Post post) {
-        Log.d("UserListManager", "Removing post: " + post.getVideoUri());
-
-        boolean removed = allPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
-        if (removed) {
-            Log.d("UserListManager", "Post removed: " + post.getVideoUri());
-        } else {
-            Log.d("UserListManager", "Post not found in allPosts: " + post.getVideoUri());
-        }
-
-        User user = getUserByUsername(post.getAuthor());
-        if (user != null) {
-            user.removeUserPost(post); // Remove the post from the user's list of posts
-        }
-
-        // Log the size of the list after removal
-        Log.d("UserListManager", "Total posts after removal: " + allPosts.size());
+//        Log.d("UserListManager", "Removing post: " + post.getVideoUri());
+//
+//        boolean removed = allPosts.removeIf(p -> p.getVideoUri().equals(post.getVideoUri()));
+//        if (removed) {
+//            Log.d("UserListManager", "Post removed: " + post.getVideoUri());
+//        } else {
+//            Log.d("UserListManager", "Post not found in allPosts: " + post.getVideoUri());
+//        }
+//
+//        User user = getUserByUsername(post.getAuthor());
+//        if (user != null) {
+//            user.removeUserPost(post); // Remove the post from the user's list of posts
+//        }
+//
+//        // Log the size of the list after removal
+//        Log.d("UserListManager", "Total posts after removal: " + allPosts.size());
     }
 
     // Method to encode a Bitmap to a Base64 string

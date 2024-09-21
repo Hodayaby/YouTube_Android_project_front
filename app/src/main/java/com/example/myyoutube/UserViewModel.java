@@ -18,5 +18,17 @@ public class UserViewModel extends AndroidViewModel {
     public LiveData<Resource<Boolean>> registerUser(String username, String password, Bitmap profilePicture) {
         return userRepository.registerUser(username, password, profilePicture);
     }
+
+    public LiveData<Resource<LoginResponse>> login(String username, String password) {
+        return userRepository.login(username, password);
+    }
+
+    public LiveData<Resource<User>> getCurrentUser() {
+        return userRepository.getCurrentUser();
+    }
+
+    public LiveData<Resource<Boolean>> clearCurrentUser() {
+        return userRepository.clearCurrentUser();
+    }
 }
 

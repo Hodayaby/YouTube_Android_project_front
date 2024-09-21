@@ -36,7 +36,6 @@ public class RegisterActivity extends AppCompatActivity {
     private Button uploadImageButton;
     private Button registerButton;
     private Bitmap selectedBitmap;
-    private UserListManager userListManager;
 
     // Constants for image requests and permissions
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -56,9 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Set the layout for the activity
         setContentView(R.layout.activity_register);
-
-        // Initialize UserListManager instance
-        userListManager = UserListManager.getInstance();
 
         // Initialize UI elements
         registerUsernameEditText = findViewById(R.id.registerUsername);
