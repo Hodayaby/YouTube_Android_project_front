@@ -249,4 +249,34 @@ public class VideoRepository {
 
         return result;
     }
+
+    public LiveData<Resource<Boolean>> deleteVideo(User currentUser, Video video) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        videoApi.deleteVideo(currentUser.getToken(), currentUser.getId(), video.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            videoDao.deleteById(video.getId());
+                            FileType.VIDEO.getFilePath(context, video).delete();
+                            FileType.THUMBNAIL.getFilePath(context, video).delete();
+                            result.postValue(Resource.success(true));
+                        }
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Server error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Network error"));
+            }
+        });
+
+        return result;
+    }
 }

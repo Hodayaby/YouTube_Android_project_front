@@ -23,6 +23,6 @@ public interface VideoDao {
     @Query("SELECT * FROM videos WHERE id = :videoId")
     Video getVideoById(int videoId);
 
-    @Query("DELETE FROM videos")
-    void deleteAllVideos();
+    @Query("DELETE FROM videos WHERE id = :id")
+    void deleteById(int id);
 }

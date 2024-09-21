@@ -388,28 +388,30 @@ public class VideoViewActivity extends AppCompatActivity {
 //        builder.show();
     }
 
-
-
-
     // Delete video
     private void deleteVideo() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Delete Video");
-//
-//        builder.setMessage("Are you sure you want to delete this video?");
-//        builder.setPositiveButton("Yes", (dialog, which) -> {
-//            UserListManager.getInstance().removePost(currentPost);
-//            Toast.makeText(VideoViewActivity.this, "Video deleted successfully", Toast.LENGTH_SHORT).show();
-//
-//            // Redirect to home screen
-//            Intent intent = new Intent(this, HomeScreenActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            finish();
-//        });
-//        builder.setNegativeButton("No", (dialog, which) -> dialog.cancel());
-//
-//        builder.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Video");
+
+        builder.setMessage("Are you sure you want to delete this video?");
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            videoViewModel.deleteVideo(currentUser, currentPost).observe(VideoViewActivity.this, resource -> {
+                if (resource.isSuccess()) {
+                    Toast.makeText(VideoViewActivity.this, "Video deleted successfully", Toast.LENGTH_SHORT).show();
+
+                    // Redirect to home screen
+                    Intent intent = new Intent(this, HomeScreenActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(VideoViewActivity.this, "Failed to delete video", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        builder.setNegativeButton("No", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 
 

@@ -40,4 +40,8 @@ public class VideoViewModel extends AndroidViewModel {
     public LiveData<Resource<Video>> likeDislikeVideo(User currentUser, Video video) {
         return videoRepository.likeDislikeVideo(currentUser, video);
     }
+
+    public LiveData<Resource<Boolean>> deleteVideo(User currentUser, Video video) {
+        return videoRepository.deleteVideo(currentUser, video);
+    }
 }

@@ -5,6 +5,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -53,6 +54,13 @@ public interface VideoApi {
             @Header("Authorization") String token,
             @Path("id") int videoId,
             @Body LikeRequest likeRequest
+    );
+
+    @DELETE("/api/users/{userId}/videos/{videoId}")
+    Call<ResponseBody> deleteVideo(
+            @Header("Authorization") String token,
+            @Path("userId") int userId,
+            @Path("videoId") int videoId
     );
 }
 
