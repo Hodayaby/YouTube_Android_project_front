@@ -214,4 +214,39 @@ public class VideoRepository {
 
         return result;
     }
+
+    public LiveData<Resource<Video>> likeDislikeVideo(User currentUser, Video video) {
+        MutableLiveData<Resource<Video>> result = new MutableLiveData<>();
+
+        videoApi.likeDislikeVideo(currentUser.getToken(), video.getId(), new LikeRequest(currentUser.getUsername())).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    new Thread(() -> {
+                        // Check if the username exists in the likes
+                        List<String> likes = new ArrayList<>(video.getLikes());
+                        if (likes.contains(currentUser.getUsername())) {
+                            // Remove the username
+                            likes.remove(currentUser.getUsername());
+                        } else {
+                            // Add the username
+                            likes.add(currentUser.getUsername());
+                        }
+                        video.setLikes(likes);
+                        videoDao.insert(video);
+                        result.postValue(Resource.success(video));
+                    }).start();
+                } else {
+                    result.setValue(Resource.error("Error: " + response.message()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.setValue(Resource.error(t.getMessage()));
+            }
+        });
+
+        return result;
+    }
 }

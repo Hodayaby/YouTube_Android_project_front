@@ -36,4 +36,8 @@ public class VideoViewModel extends AndroidViewModel {
     public LiveData<Resource<Video>> uploadVideo(User currentUser, File videoFile, File thumbnail, String title, String description) {
         return videoRepository.uploadVideo(currentUser, videoFile, thumbnail, title, description);
     }
+
+    public LiveData<Resource<Video>> likeDislikeVideo(User currentUser, Video video) {
+        return videoRepository.likeDislikeVideo(currentUser, video);
+    }
 }

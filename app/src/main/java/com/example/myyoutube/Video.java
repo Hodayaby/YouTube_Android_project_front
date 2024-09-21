@@ -20,7 +20,6 @@ public class Video {
     private int views;
     @Ignore
     private List<Comment> comments = new ArrayList<>();
-    @Ignore
     private List<String> likes = new ArrayList<>();
 
     public int getId() {

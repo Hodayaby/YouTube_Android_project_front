@@ -40,7 +40,7 @@ public class VideoViewActivity extends AppCompatActivity {
     private VideoView videoView;
     private EditText commentEditText;
     private ImageButton likeButton;
-    private ImageButton dislikeButton;
+//    private ImageButton dislikeButton;
     private Button addCommentButton;
     private LinearLayout commentsContainer;
     private ImageButton shareButton;
@@ -95,7 +95,7 @@ public class VideoViewActivity extends AppCompatActivity {
         videoView = findViewById(R.id.videoView);
         commentEditText = findViewById(R.id.commentBox);
         likeButton = findViewById(R.id.likeButton);
-        dislikeButton = findViewById(R.id.dislikeButton);
+//        dislikeButton = findViewById(R.id.dislikeButton);
         addCommentButton = findViewById(R.id.addCommentButton);
         commentsContainer = findViewById(R.id.commentsContainer);
         shareButton = findViewById(R.id.shareButton);
@@ -154,7 +154,7 @@ public class VideoViewActivity extends AppCompatActivity {
         likeButton.setOnClickListener(v -> handleLikeClick());
 
         // Set up dislike button click listener
-        dislikeButton.setOnClickListener(v -> handleDislikeClick());
+//        dislikeButton.setOnClickListener(v -> handleDislikeClick());
 
         // Set up add comment button click listener
         addCommentButton.setOnClickListener(v -> {
@@ -202,38 +202,37 @@ public class VideoViewActivity extends AppCompatActivity {
     }
 
     private void updateLikeDislikeButtons() {
-//        if (currentUser != null) {
-//            if (currentUser.isLiked(currentPost)) {
-//                likeButton.setColorFilter(getResources().getColor(R.color.blue));
-//            } else {
-//                likeButton.clearColorFilter();
-//            }
-//
+        if (currentUser != null) {
+            if (currentPost.getLikes().contains(currentUser.getUsername())) {
+                likeButton.setColorFilter(getResources().getColor(R.color.blue));
+            } else {
+                likeButton.clearColorFilter();
+            }
+
 //            if (currentUser.isDisliked(currentPost)) {
 //                dislikeButton.setColorFilter(getResources().getColor(R.color.blue));
 //            } else {
 //                dislikeButton.clearColorFilter();
 //            }
-//        }
+        }
     }
 
     private void handleLikeClick() {
-//        if (currentUser == null || currentUser.getUsername() == null) {
-//            Toast.makeText(this, "Please login to like videos", Toast.LENGTH_SHORT).show();
-//        } else {
-//            if (currentUser.isLiked(currentPost)) {
-//                currentUser.removeLikedPost(currentPost);
-//            } else {
-//                if (currentUser.isDisliked(currentPost)) {
-//                    currentUser.removeDislikedPost(currentPost);
-//                }
-//                currentUser.addLikedPost(currentPost);
-//            }
-//        }
-//        updateLikeDislikeButtons();
+        if (currentUser == null || currentUser.getUsername() == null) {
+            Toast.makeText(this, "Please login to like videos", Toast.LENGTH_SHORT).show();
+        } else {
+            videoViewModel.likeDislikeVideo(currentUser, currentPost).observe(this, resource -> {
+                if (resource.isSuccess()) {
+                    currentPost = resource.getData();
+                    updateLikeDislikeButtons();
+                } else {
+                    Toast.makeText(VideoViewActivity.this, "Failed to update like/dislike", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
-    private void handleDislikeClick() {
+//    private void handleDislikeClick() {
 //        if (currentUser == null || currentUser.getUsername() == null) {
 //            Toast.makeText(this, "Please login to dislike videos", Toast.LENGTH_SHORT).show();
 //        } else {
@@ -247,7 +246,7 @@ public class VideoViewActivity extends AppCompatActivity {
 //            }
 //        }
 //        updateLikeDislikeButtons();
-    }
+//    }
 
     // Load comments and update the view
     private void loadComments() {

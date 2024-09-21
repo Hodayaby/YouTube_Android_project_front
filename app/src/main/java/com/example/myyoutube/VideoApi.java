@@ -47,5 +47,12 @@ public interface VideoApi {
             @Part("title") RequestBody title,
             @Part("description") RequestBody description
     );
+
+    @POST("/api/videos/{id}/like")
+    Call<ResponseBody> likeDislikeVideo(
+            @Header("Authorization") String token,
+            @Path("id") int videoId,
+            @Body LikeRequest likeRequest
+    );
 }
 
