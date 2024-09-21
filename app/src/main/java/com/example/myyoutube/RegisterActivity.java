@@ -5,11 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,8 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import java.io.ByteArrayOutputStream;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -45,9 +43,13 @@ public class RegisterActivity extends AppCompatActivity {
     private static final int CAPTURE_IMAGE_REQUEST = 2;
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
+    private UserViewModel userViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
@@ -80,22 +82,23 @@ public class RegisterActivity extends AppCompatActivity {
 
                 // Validate registration details
                 if (validateRegistration(username, password, confirmPassword, displayName)) {
-                    // Check if username already exists
-                    if (userListManager.isUsernameTaken(username)) {
-                        registerUsernameEditText.setError("Username already exists");
-                        return;
-                    }
 
                     // Save user details
-                    saveUserDetails(username, password, displayName, selectedBitmap);
+                    userViewModel.registerUser(username, password, selectedBitmap).observe(RegisterActivity.this, new Observer<Resource<Boolean>>() {
+                        @Override
+                        public void onChanged(Resource<Boolean> result) {
+                            if (result.isSuccess()) {
+                                Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
 
-                    // Display registration success message
-                    Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-
-                    // Navigate to login screen
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                                // Navigate to login screen
+                                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(RegisterActivity.this, result.getError(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -230,33 +233,6 @@ public class RegisterActivity extends AppCompatActivity {
     // Method to clear error on EditText
     private void clearErrorOnEditText(EditText editText) {
         editText.setError(null);
-    }
-
-    // Method to save user details
-    private void saveUserDetails(String username, String password, String displayName, Bitmap profileImage) {
-        // Create a new user instance
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setDisplayName(displayName);
-        user.setProfileImage(profileImage);
-
-        // Add the user to the UserListManager
-        userListManager.addUser(user);
-    }
-
-    // Method to encode Bitmap to String (Base64)
-    private String encodeBitmapToString(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    // Method to decode String (Base64) to Bitmap
-    private Bitmap decodeStringToBitmap(String encodedString) {
-        byte[] decodedByte = Base64.decode(encodedString, 0);
-        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
     }
 
     // Method to check if password is valid (contains both letters and numbers)
