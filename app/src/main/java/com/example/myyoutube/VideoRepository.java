@@ -279,4 +279,50 @@ public class VideoRepository {
 
         return result;
     }
+
+    public LiveData<Resource<Boolean>> editVideo(
+            User currentUser,
+            Video video,
+            File videoFile,
+            File thumbnail) {
+
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+        RequestBody titleBody = RequestBody.create(MediaType.parse("text/plain"), video.getTitle());
+        RequestBody descriptionBody = RequestBody.create(MediaType.parse("text/plain"), video.getDescription());
+
+        MultipartBody.Part videoPart = null;
+        MultipartBody.Part thumbnailPart = null;
+
+        if (videoFile != null) {
+            RequestBody videoBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
+            videoPart = MultipartBody.Part.createFormData("videoFile", videoFile.getName(), videoBody);
+        }
+
+        if (thumbnail != null) {
+            RequestBody thumbnailBody = RequestBody.create(MediaType.parse("image/*"), thumbnail);
+            thumbnailPart = MultipartBody.Part.createFormData("thumbnail", thumbnail.getName(), thumbnailBody);
+        }
+
+        videoApi.editVideo(currentUser.getToken(), currentUser.getId(), video.getId(), titleBody, descriptionBody, videoPart, thumbnailPart).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // server doesn't return the updated video
+                    new Thread(() -> {
+                        videoDao.insert(video);
+                        result.postValue(Resource.success(true));
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Server error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Network error"));
+            }
+        });
+
+        return result;
+    }
 }

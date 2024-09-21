@@ -353,39 +353,43 @@ public class VideoViewActivity extends AppCompatActivity {
     }
 
     // Show custom dialog to edit video details
-
     private void showEditVideoDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Edit Video");
-//
-//        View view = getLayoutInflater().inflate(R.layout.edit_video_dialog, null);
-//        EditText videoTitleInput = view.findViewById(R.id.editVideoTitle);
-//        EditText videoDescInput = view.findViewById(R.id.editVideoDesc);
-//
-//        // Set the current video title and description in the input fields
-//        videoTitleInput.setText(currentPost.getContent());
-//        videoDescInput.setText(currentPost.getDescription());
-//
-//        builder.setView(view);
-//
-//        builder.setPositiveButton("Save", (dialog, which) -> {
-//            String editedTitle = videoTitleInput.getText().toString();
-//            String editedDesc = videoDescInput.getText().toString();
-//
-//            if (!TextUtils.isEmpty(editedTitle) && !TextUtils.isEmpty(editedDesc)) {
-//                currentPost.setContent(editedTitle);
-//                currentPost.setDescription(editedDesc);
-//                videoTitleTextView.setText(editedTitle);
-//                videoDescTextView.setText(editedDesc);
-//                userListManager.updatePost(currentPost); // Update post in the manager
-//                Toast.makeText(VideoViewActivity.this, "Video details updated successfully", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(VideoViewActivity.this, "Title and description cannot be empty", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-//
-//        builder.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Video");
+
+        View view = getLayoutInflater().inflate(R.layout.edit_video_dialog, null);
+        EditText videoTitleInput = view.findViewById(R.id.editVideoTitle);
+        EditText videoDescInput = view.findViewById(R.id.editVideoDesc);
+
+        // Set the current video title and description in the input fields
+        videoTitleInput.setText(currentPost.getTitle());
+        videoDescInput.setText(currentPost.getDescription());
+
+        builder.setView(view);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String editedTitle = videoTitleInput.getText().toString();
+            String editedDesc = videoDescInput.getText().toString();
+
+            if (!TextUtils.isEmpty(editedTitle) && !TextUtils.isEmpty(editedDesc)) {
+                currentPost.setTitle(editedTitle);
+                currentPost.setDescription(editedDesc);
+                videoTitleTextView.setText(editedTitle);
+                videoDescTextView.setText(editedDesc);
+                videoViewModel.editVideo(currentUser, currentPost, null, null).observe(VideoViewActivity.this, resource -> {
+                    if (resource.isSuccess()) {
+                        Toast.makeText(VideoViewActivity.this, "Video details updated successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(VideoViewActivity.this, "Failed to update video", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(VideoViewActivity.this, "Title and description cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 
     // Delete video

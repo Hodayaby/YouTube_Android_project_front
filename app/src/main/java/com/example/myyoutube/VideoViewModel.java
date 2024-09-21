@@ -44,4 +44,12 @@ public class VideoViewModel extends AndroidViewModel {
     public LiveData<Resource<Boolean>> deleteVideo(User currentUser, Video video) {
         return videoRepository.deleteVideo(currentUser, video);
     }
+
+    public LiveData<Resource<Boolean>> editVideo(
+            User currentUser,
+            Video video,
+            File videoFile,
+            File thumbnail) {
+        return videoRepository.editVideo(currentUser, video, videoFile, thumbnail);
+    }
 }

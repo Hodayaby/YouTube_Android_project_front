@@ -10,6 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
@@ -61,6 +62,18 @@ public interface VideoApi {
             @Header("Authorization") String token,
             @Path("userId") int userId,
             @Path("videoId") int videoId
+    );
+
+    @Multipart
+    @PUT("/api/users/{userId}/videos/{videoId}")
+    Call<ResponseBody> editVideo(
+            @Header("Authorization") String token,
+            @Path("userId") int userId,
+            @Path("videoId") int videoId,
+            @Part("title") RequestBody title,
+            @Part("description") RequestBody description,
+            @Part MultipartBody.Part videoFile, // Optional, pass null if not editing the video file
+            @Part MultipartBody.Part thumbnail  // Optional, pass null if not editing the thumbnail
     );
 }
 
