@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VideoViewActivity extends AppCompatActivity {
@@ -259,21 +260,34 @@ public class VideoViewActivity extends AppCompatActivity {
 
     // Add comment to the post and update the view
     private void addComment() {
-//        String commentText = commentEditText.getText().toString();
-//        if (TextUtils.isEmpty(commentText)) {
-//            Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
+        String commentText = commentEditText.getText().toString();
+        if (TextUtils.isEmpty(commentText)) {
+            Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 //        String profileImageBase64 = null;
 //        if (currentUser.getProfileImage() != null) {
 //            profileImageBase64 = userListManager.encodeBitmapToBase64(currentUser.getProfileImage());
 //        }
-//
-//        Comment newComment = new Comment(currentUser.getUsername(), commentText, profileImageBase64);
-//        currentPost.addComment(newComment);
-//        loadComments(); // Reload comments to display the new comment
-//        commentEditText.setText(""); // Clear the comment box
+
+        Comment newComment = new Comment();
+        newComment.setText(commentText);
+        newComment.setUser(currentUser.getUsername());
+        newComment.setVideoId(currentPost.getId());
+
+        videoViewModel.addComment(currentUser, newComment).observe(this, resource -> {
+            if (resource.isSuccess()) {
+                Toast.makeText(this, "Comment added", Toast.LENGTH_SHORT).show();
+                ArrayList<Comment> comments = new ArrayList<>(currentPost.getComments());
+                comments.add(newComment);
+                currentPost.setComments(comments);
+                loadComments(); // Reload comments to display the new comment
+                commentEditText.setText(""); // Clear the comment box
+            } else {
+                Toast.makeText(this, "Failed to add the comment", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Add a comment view with edit and delete buttons if applicable

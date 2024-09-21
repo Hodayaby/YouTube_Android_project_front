@@ -6,6 +6,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -74,6 +76,16 @@ public interface VideoApi {
             @Part("description") RequestBody description,
             @Part MultipartBody.Part videoFile, // Optional, pass null if not editing the video file
             @Part MultipartBody.Part thumbnail  // Optional, pass null if not editing the thumbnail
+    );
+
+    @POST("/api/users/{userId}/videos/{videoId}/comment")
+    @FormUrlEncoded
+    Call<ResponseBody> addComment(
+            @Header("Authorization") String token,
+            @Path("userId") int userId,
+            @Path("videoId") int videoId,
+            @Field("user") String username,
+            @Field("text") String commentText
     );
 }
 

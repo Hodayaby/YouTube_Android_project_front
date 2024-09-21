@@ -52,4 +52,8 @@ public class VideoViewModel extends AndroidViewModel {
             File thumbnail) {
         return videoRepository.editVideo(currentUser, video, videoFile, thumbnail);
     }
+
+    public LiveData<Resource<Boolean>> addComment(User currentUser, Comment comment) {
+        return videoRepository.addComment(currentUser, comment);
+    }
 }

@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -310,6 +311,31 @@ public class VideoRepository {
                     // server doesn't return the updated video
                     new Thread(() -> {
                         videoDao.insert(video);
+                        result.postValue(Resource.success(true));
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Server error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Network error"));
+            }
+        });
+
+        return result;
+    }
+
+    public LiveData<Resource<Boolean>> addComment(User currentUser, Comment comment) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        videoApi.addComment(currentUser.getToken(), currentUser.getId(), comment.getVideoId(), comment.getUser(), comment.getText()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    new Thread(() -> {
+                        commentDao.insertComments(Collections.singletonList(comment));
                         result.postValue(Resource.success(true));
                     }).start();
                 } else {
