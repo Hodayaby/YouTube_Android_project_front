@@ -4,6 +4,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "videos")
@@ -18,9 +19,9 @@ public class Video {
     private int authorId;
     private int views;
     @Ignore
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
     @Ignore
-    private List<String> likes;
+    private List<String> likes = new ArrayList<>();
 
     public int getId() {
         return id;

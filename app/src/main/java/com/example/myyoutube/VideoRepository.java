@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -20,11 +21,14 @@ public class VideoRepository {
     private final Context context;
     private VideoApi videoApi;
     private VideoDao videoDao;
+    private CommentDao commentDao;
 
     public VideoRepository(Context context) {
         this.context = context;
         videoApi = RetrofitClient.getRetrofitInstance().create(VideoApi.class);
-        videoDao = DatabaseClient.getInstance(context).getAppDatabase().videoDao();
+        AppDatabase appDatabase = DatabaseClient.getInstance(context).getAppDatabase();
+        videoDao = appDatabase.videoDao();
+        commentDao = appDatabase.commentDao();
     }
 
     public LiveData<Resource<List<Video>>> getAllVideos() {
@@ -36,22 +40,49 @@ public class VideoRepository {
                 if (response.isSuccessful()) {
                     // Save videos to Room and update LiveData
                     new Thread(() -> {
+                        List<Video> videos = response.body().getVideos();
                         try {
-                            videoDao.insertVideos(response.body().getVideos());
+                            videoDao.insertVideos(videos);
+                            ArrayList<Comment> comments = new ArrayList<>();
+                            for (Video video : videos) {
+                                for (Comment comment : video.getComments()) {
+                                    comment.setVideoId(video.getId());
+                                    comments.add(comment);
+                                }
+                            }
+                            commentDao.insertComments(comments);
                         } catch (Exception e) {
                         }
-                        videosLiveData.postValue(Resource.success(response.body().getVideos()));
+                        videosLiveData.postValue(Resource.success(videos));
+                    }).start();
+                } else {
+                    new Thread(() -> {
+                        List<Video> allVideos = getVideos();
+                        videosLiveData.postValue(Resource.success(allVideos));
                     }).start();
                 }
             }
 
             @Override
             public void onFailure(Call<VideosResult> call, Throwable t) {
-                videosLiveData.postValue(Resource.error(t.getMessage()));
+//                videosLiveData.postValue(Resource.error(t.getMessage()));
+                new Thread(() -> {
+                    List<Video> allVideos = getVideos();
+                    videosLiveData.postValue(Resource.success(allVideos));
+                }).start();
             }
         });
 
         return videosLiveData;
+    }
+
+    private List<Video> getVideos() {
+        List<Video> videos = videoDao.getAllVideos();
+        for (Video video : videos) {
+            List<Comment> comments = commentDao.getCommentsByVideoId(video.getId());
+            video.setComments(comments);
+        }
+        return videos;
     }
 
     public LiveData<Resource<Boolean>> downloadFile(Video video, FileType fileType) {
@@ -70,7 +101,7 @@ public class VideoRepository {
 
         String filepath = fileType == FileType.VIDEO ? video.getUrl() : video.getThumbnail();
         String uploadsUrl = "http://localhost:8000/";
-        if (filepath.startsWith(uploadsUrl)) { // fixing server bug
+        if (filepath.startsWith(uploadsUrl)) {
             filepath = filepath.substring(uploadsUrl.length());
         }
 
@@ -101,5 +132,20 @@ public class VideoRepository {
         });
 
         return result;
+    }
+
+    public LiveData<Resource<Video>> getVideoById(int id) {
+        MutableLiveData<Resource<Video>> liveData = new MutableLiveData<>();
+        new Thread(() -> {
+            Video video = videoDao.getVideoById(id);
+            if (video == null) {
+                liveData.postValue(Resource.error("Video not found for id " + id));
+            } else {
+                List<Comment> comments = commentDao.getCommentsByVideoId(id);
+                video.setComments(comments);
+                liveData.postValue(Resource.success(video));
+            }
+        }).start();
+        return liveData;
     }
 }

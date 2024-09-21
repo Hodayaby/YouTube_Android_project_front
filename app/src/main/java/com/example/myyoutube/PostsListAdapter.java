@@ -81,6 +81,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             holder.itemView.setOnClickListener(v -> {
                 Context context = holder.itemView.getContext();
                 Intent intent = new Intent(context, VideoViewActivity.class);
+                intent.putExtra("videoId", current.getId());
                 context.startActivity(intent);
             });
         }
@@ -148,7 +149,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         viewModel.downloadFile(video, FileType.THUMBNAIL).observe((LifecycleOwner) context, resource -> {
             if (resource != null && resource.getData() != null && resource.getData() == true) {
                 // Create a file reference where the thumbnail is saved
-                File thumbnailFile = new File(context.getFilesDir(), video.getId() + "_THUMBNAIL");
+                File thumbnailFile = FileType.THUMBNAIL.getFilePath(context, video);
 
                 // Check if the file exists
                 if (thumbnailFile.exists()) {

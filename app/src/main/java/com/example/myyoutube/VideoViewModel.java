@@ -23,4 +23,8 @@ public class VideoViewModel extends AndroidViewModel {
     public LiveData<Resource<Boolean>> downloadFile(Video video, FileType fileType) {
         return videoRepository.downloadFile(video, fileType);
     }
+
+    public LiveData<Resource<Video>> getVideoById(int id) {
+        return videoRepository.getVideoById(id);
+    }
 }
