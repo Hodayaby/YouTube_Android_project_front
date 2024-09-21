@@ -314,13 +314,13 @@ public class VideoViewActivity extends AppCompatActivity {
             userImageView.setImageResource(R.drawable.ic_profile); // Default image
 //        }
 
-//        if (currentUser != null && comment.getUsername().equals(currentUser.getUsername())) {
-//            editDeleteContainer.setVisibility(View.VISIBLE); // Show the container
-//            editButton.setOnClickListener(v -> editComment(comment, commentTextView));
-//            deleteButton.setOnClickListener(v -> deleteComment(comment, commentView));
-//        } else {
+        if (currentUser != null && comment.getUser().equals(currentUser.getUsername())) {
+            editDeleteContainer.setVisibility(View.VISIBLE); // Show the container
+            editButton.setOnClickListener(v -> editComment(comment, commentTextView));
+            deleteButton.setOnClickListener(v -> deleteComment(comment, commentView));
+        } else {
             editDeleteContainer.setVisibility(View.GONE); // Hide the container
-//        }
+        }
 
         commentsContainer.addView(commentView);
     }
@@ -339,7 +339,14 @@ public class VideoViewActivity extends AppCompatActivity {
             if (!TextUtils.isEmpty(editedComment)) {
                 comment.setText(editedComment);
 //                comment.setTimestamp(new Comment(currentUser.getUsername(), editedComment).getTimestamp()); // Update timestamp
-                commentTextView.setText(editedComment);
+                videoViewModel.editComment(currentUser, currentPost, comment).observe(VideoViewActivity.this, resource -> {
+                    if (resource.isSuccess()) {
+                        Toast.makeText(VideoViewActivity.this, "Comment updated", Toast.LENGTH_SHORT).show();
+                        commentTextView.setText(editedComment);
+                    } else {
+                        Toast.makeText(VideoViewActivity.this, "Failed to update the comment", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(VideoViewActivity.this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
             }

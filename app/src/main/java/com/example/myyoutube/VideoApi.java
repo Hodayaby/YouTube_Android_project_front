@@ -87,5 +87,15 @@ public interface VideoApi {
             @Field("user") String username,
             @Field("text") String commentText
     );
+
+    @PUT("/api/users/{id}/videos/{pid}/comment")
+    @FormUrlEncoded
+    Call<ResponseBody> editComment(
+            @Header("Authorization") String token,
+            @Path("id") int userId,
+            @Path("pid") int videoId,
+            @Field("commentId") int commentId,
+            @Field("text") String commentText
+    );
 }
 

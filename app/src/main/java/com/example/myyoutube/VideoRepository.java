@@ -351,4 +351,30 @@ public class VideoRepository {
 
         return result;
     }
+
+    public LiveData<Resource<Boolean>> editComment(User currentUser, Video video, Comment comment) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        videoApi.editComment(currentUser.getToken(), currentUser.getId(), video.getId(), comment.getId(), comment.getText()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // Update the comment in the Room database
+                    new Thread(() -> {
+                        commentDao.insertComments(Collections.singletonList(comment)); // Save updated comment locally
+                        result.postValue(Resource.success(true));
+                    }).start();
+                } else {
+                    result.postValue(Resource.error("Failed to edit comment"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Request failed"));
+            }
+        });
+
+        return result;
+    }
 }
