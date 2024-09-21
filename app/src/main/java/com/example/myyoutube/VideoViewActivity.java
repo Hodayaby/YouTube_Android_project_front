@@ -358,8 +358,16 @@ public class VideoViewActivity extends AppCompatActivity {
 
     // Delete comment and remove the view
     private void deleteComment(Comment comment, View commentView) {
-//        currentPost.removeComment(comment);
-//        commentsContainer.removeView(commentView);
+        videoViewModel.deleteComment(currentUser, currentPost, comment).observe(this, resource -> {
+              if (resource.isSuccess()) {
+                  ArrayList<Comment> comments = new ArrayList<>(currentPost.getComments());
+                  comments.remove(comment);
+                  commentsContainer.removeView(commentView);
+                  Toast.makeText(VideoViewActivity.this, "Comment removed", Toast.LENGTH_SHORT).show();
+              } else {
+                  Toast.makeText(VideoViewActivity.this, "Failed to remove the comment", Toast.LENGTH_SHORT).show();
+              }
+        });
     }
 
     // Share video using Android Sharesheet

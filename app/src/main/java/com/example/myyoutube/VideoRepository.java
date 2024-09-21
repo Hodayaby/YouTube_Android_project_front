@@ -377,4 +377,32 @@ public class VideoRepository {
 
         return result;
     }
+
+    public LiveData<Resource<Boolean>> deleteComment(User currentUser, Video video, Comment comment) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        DeleteCommentRequest request = new DeleteCommentRequest(comment.getId());
+
+        videoApi.deleteComment(currentUser.getToken(), currentUser.getId(), video.getId(), request).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // Remove the comment from the Room database
+                    new Thread(() -> {
+                        commentDao.deleteById(comment.getId()); // Delete comment locally
+                        result.postValue(Resource.success(true));
+                    });
+                } else {
+                    result.postValue(Resource.error("Failed to delete comment"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Request failed"));
+            }
+        });
+
+        return result;
+    }
 }

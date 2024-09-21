@@ -15,4 +15,7 @@ public interface CommentDao {
 
     @Query("SELECT * FROM comments WHERE videoId = :videoId")
     List<Comment> getCommentsByVideoId(int videoId);
+
+    @Query("DELETE FROM videos WHERE id = :id")
+    void deleteById(int id);
 }

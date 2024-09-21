@@ -97,5 +97,15 @@ public interface VideoApi {
             @Field("commentId") int commentId,
             @Field("text") String commentText
     );
+
+    @DELETE("/api/users/{id}/videos/{pid}/comment")
+//    @FormUrlEncoded
+    Call<ResponseBody> deleteComment(// doesn't work, delete can't have body
+            @Header("Authorization") String token,
+            @Path("id") int userId,
+            @Path("pid") int videoId,
+//            @Field("commentId") int commentId
+            @Body DeleteCommentRequest deleteCommentRequest
+    );
 }
 
