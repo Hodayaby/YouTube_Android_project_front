@@ -102,6 +102,22 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         notifyDataSetChanged();
     }
 
+    public void showLikedOnlyBy(String user) {
+        ArrayList<Video> likedVideos = new ArrayList<>();
+        for (Video video : postsFull) {
+            if (video.getLikes().contains(user)) {
+                likedVideos.add(video);
+            }
+        }
+        posts = likedVideos;
+        notifyDataSetChanged();
+    }
+
+    public void resetPosts() {
+        posts = new ArrayList<>(postsFull);
+        notifyDataSetChanged();
+    }
+
     // Return the filter for the posts
     @Override
     public Filter getFilter() {

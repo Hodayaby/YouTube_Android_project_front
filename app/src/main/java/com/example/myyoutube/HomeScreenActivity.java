@@ -152,7 +152,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
             // If showing favorite videos, reload all videos
             if (showingFavoriteVideos) {
-//                refreshPostList();
+                postsListAdapter.resetPosts();
                 showingFavoriteVideos = false;
             }
         });
@@ -274,8 +274,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     // Show favorite videos of the current user
     private void showFavoriteVideos() {
         if (currentUser != null && currentUser.getUsername() != null) {
-//            List<Post> likedPosts = currentUser.getLikedPosts();
-//            postsListAdapter.setPosts(likedPosts);
+            postsListAdapter.showLikedOnlyBy(currentUser.getUsername());
             showingFavoriteVideos = true; // Update the flag
         } else {
             Toast.makeText(this, "Please login to see your favorite videos", Toast.LENGTH_SHORT).show();
