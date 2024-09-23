@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -151,6 +152,82 @@ public class UserRepository {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 result.postValue(Resource.error("Request failed"));
+            }
+        });
+
+        return result;
+    }
+
+    public LiveData<Resource<User>> getUserById(int userId) {
+        MutableLiveData<Resource<User>> result = new MutableLiveData<>();
+
+        videoApi.getUserById(userId).enqueue(new Callback<UserResult>() {
+            @Override
+            public void onResponse(Call<UserResult> call, Response<UserResult> response) {
+                if (response.isSuccessful()) {
+                    result.postValue(Resource.success(response.body().getUser()));
+                } else if (response.code() == 400) {
+                    result.postValue(Resource.error("User does not exist"));
+                } else {
+                    result.postValue(Resource.error("Failed to retrieve user"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResult> call, Throwable t) {
+                result.postValue(Resource.error("Request failed"));
+            }
+        });
+
+        return result;
+    }
+
+
+    public LiveData<Resource<User>> updateUserProfile(User currentUser, Bitmap profilePicture, String password) {
+        MutableLiveData<Resource<User>> result = new MutableLiveData<>();
+
+        // Create the RequestBody for the password
+        RequestBody passwordBody = RequestBody.create(MediaType.parse("multipart/form-data"), password);
+
+        // Create the MultipartBody.Part for the profile picture if it exists
+        MultipartBody.Part profilePicturePart = null;
+        if (profilePicture != null) {
+            // Convert Bitmap to ByteArray
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            profilePicture.compress(Bitmap.CompressFormat.JPEG, 100, bos); // You can change the format and quality
+            byte[] imageBytes = bos.toByteArray();
+
+            // Create the RequestBody for the profile picture
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageBytes);
+            String id = UUID.randomUUID().toString();
+            profilePicturePart = MultipartBody.Part.createFormData("profilePicture", "profile_" + id + ".jpg", requestFile);
+        }
+
+        // Make the Retrofit call asynchronously
+        videoApi.editUser(currentUser.getToken(), currentUser.getId(), profilePicturePart, passwordBody).enqueue(new Callback<UserResult>() {
+            @Override
+            public void onResponse(Call<UserResult> call, Response<UserResult> response) {
+                if (response.isSuccessful()) {
+                    if (profilePicture != null) {
+                        File file = FileType.PROFILE.getFilePath(context, currentUser);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                        new Thread(() -> {
+                            User user = response.body().getUser();
+                            userDao.updatePictureUrl(user.getProfilePicture(), user.getId());
+                            User updatedUser = userDao.getUserWithToken();
+                            result.postValue(Resource.success(updatedUser));
+                        }).start();
+                    }
+                } else {
+                    result.setValue(Resource.error("Failed to update profile"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResult> call, Throwable t) {
+                result.setValue(Resource.error("Network error"));
             }
         });
 

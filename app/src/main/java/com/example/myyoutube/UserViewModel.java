@@ -34,5 +34,13 @@ public class UserViewModel extends AndroidViewModel {
     public LiveData<Resource<Boolean>> deleteUser(User currentUser) {
         return userRepository.deleteUser(currentUser);
     }
+
+    public LiveData<Resource<User>> getUserById(int userId) {
+        return userRepository.getUserById(userId);
+    }
+
+    public LiveData<Resource<User>> updateUserProfile(User currentUser, Bitmap profilePicture, String password) {
+        return userRepository.updateUserProfile(currentUser, profilePicture, password);
+    }
 }
 

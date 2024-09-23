@@ -18,4 +18,7 @@ public interface UserDao {
 
     @Query("DELETE FROM users WHERE token is not null")
     void deleteUserWithToken();
+
+    @Query("UPDATE users SET profilePicture = :pictureUrl WHERE id = :id")
+    void updatePictureUrl(String pictureUrl, int id);
 }

@@ -115,5 +115,19 @@ public interface VideoApi {
             @Header("Authorization") String token,
             @Path("id") int userId
     );
+
+    @GET("/api/users/{id}")
+    Call<UserResult> getUserById(
+            @Path("id") int userId
+    );
+
+    @Multipart
+    @PUT("/api/users/{id}")
+    Call<UserResult> editUser(
+            @Header("Authorization") String token,
+            @Path("id") int userId,
+            @Part MultipartBody.Part profilePicture,
+            @Part("password") RequestBody password
+    );
 }
 
