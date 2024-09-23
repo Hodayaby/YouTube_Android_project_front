@@ -9,6 +9,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -98,13 +99,11 @@ public interface VideoApi {
             @Field("text") String commentText
     );
 
-    @DELETE("/api/users/{id}/videos/{pid}/comment")
-//    @FormUrlEncoded
-    Call<ResponseBody> deleteComment(// doesn't work, delete can't have body
+    @HTTP(method = "DELETE", path = "/api/users/{id}/videos/{pid}/comment", hasBody = true)
+    Call<ResponseBody> deleteComment(
             @Header("Authorization") String token,
             @Path("id") int userId,
             @Path("pid") int videoId,
-//            @Field("commentId") int commentId
             @Body DeleteCommentRequest deleteCommentRequest
     );
 }

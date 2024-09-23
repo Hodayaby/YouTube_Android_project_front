@@ -362,6 +362,7 @@ public class VideoViewActivity extends AppCompatActivity {
               if (resource.isSuccess()) {
                   ArrayList<Comment> comments = new ArrayList<>(currentPost.getComments());
                   comments.remove(comment);
+                  currentPost.setComments(comments);
                   commentsContainer.removeView(commentView);
                   Toast.makeText(VideoViewActivity.this, "Comment removed", Toast.LENGTH_SHORT).show();
               } else {

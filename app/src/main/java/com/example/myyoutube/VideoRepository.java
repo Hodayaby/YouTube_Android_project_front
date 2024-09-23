@@ -391,7 +391,7 @@ public class VideoRepository {
                     new Thread(() -> {
                         commentDao.deleteById(comment.getId()); // Delete comment locally
                         result.postValue(Resource.success(true));
-                    });
+                    }).start();
                 } else {
                     result.postValue(Resource.error("Failed to delete comment"));
                 }
