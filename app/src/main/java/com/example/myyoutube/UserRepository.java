@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.MediaType;
@@ -123,6 +124,35 @@ public class UserRepository {
                 result.postValue(Resource.error(e.getMessage()));
             }
         }).start();
+
+        return result;
+    }
+
+    public LiveData<Resource<Boolean>> deleteUser(User currentUser) {
+        MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
+
+        videoApi.deleteUser(currentUser.getToken(), currentUser.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    new Thread(() -> {
+                        try {
+                            userDao.deleteUserWithToken();
+                        } catch (Exception e) { }
+                        result.postValue(Resource.success(true));
+                    }).start();
+                } else if (response.code() == 400) {
+                    result.postValue(Resource.error("User does not exist"));
+                } else {
+                    result.postValue(Resource.error("Failed to delete user"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                result.postValue(Resource.error("Request failed"));
+            }
+        });
 
         return result;
     }

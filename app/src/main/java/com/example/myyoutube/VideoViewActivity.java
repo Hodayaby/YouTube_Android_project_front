@@ -104,6 +104,14 @@ public class VideoViewActivity extends AppCompatActivity {
         deleteVideoButton = findViewById(R.id.deleteButton);
         previewImageView = findViewById(R.id.previewImage);
         uploadImageSuccess = findViewById(R.id.uploadImageSuccess);
+        findViewById(R.id.profileRow).setOnClickListener(v -> {
+            if (currentPost == null) return;
+
+            Intent intent = new Intent(VideoViewActivity.this, UserProfileActivity.class);
+            intent.putExtra("userId", currentPost.getAuthorId());
+            intent.putExtra("userName", currentPost.getUploadedBy());
+            startActivity(intent);
+        });
 
         // Get data from intent
         int videoId = getIntent().getIntExtra("videoId", -1);

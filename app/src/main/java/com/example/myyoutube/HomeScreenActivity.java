@@ -191,6 +191,14 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
         // Update the dark mode menu item title initially
         updateMenuTitle(navigationView.getMenu().findItem(R.id.nav_dark_mode), ThemeManager.isDarkMode());
+
+        profileImage.setOnClickListener(v -> {
+            if (currentUser == null) return;
+            Intent intent = new Intent(HomeScreenActivity.this, UserProfileActivity.class);
+            intent.putExtra("userId", currentUser.getId());
+            intent.putExtra("userName", currentUser.getUsername());
+            startActivity(intent);
+        });
     }
 
     @Override

@@ -203,6 +203,7 @@
 
             <!-- LinearLayout for channel details (profile image, name and YouTube logo) -->
             <LinearLayout
+                android:id="@+id/profileRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

@@ -106,5 +106,14 @@ public interface VideoApi {
             @Path("pid") int videoId,
             @Body DeleteCommentRequest deleteCommentRequest
     );
+
+    @GET("/api/users/{id}/videos")
+    Call<VideosResult> getUserVideos(@Path("id") int userId);
+
+    @DELETE("/api/users/{id}")
+    Call<ResponseBody> deleteUser(
+            @Header("Authorization") String token,
+            @Path("id") int userId
+    );
 }
 

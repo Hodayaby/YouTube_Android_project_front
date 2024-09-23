@@ -405,4 +405,28 @@ public class VideoRepository {
 
         return result;
     }
+
+
+    public LiveData<Resource<List<Video>>> getUserVideos(int userId) {
+        MutableLiveData<Resource<List<Video>>> result = new MutableLiveData<>();
+
+        videoApi.getUserVideos(userId).enqueue(new Callback<VideosResult>() {
+            @Override
+            public void onResponse(Call<VideosResult> call, Response<VideosResult> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Video> videos = response.body().getVideos();
+                    result.postValue(Resource.success(videos));
+                } else {
+                    result.postValue(Resource.error("Failed to fetch user videos"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VideosResult> call, Throwable t) {
+                result.postValue(Resource.error("Request failed"));
+            }
+        });
+
+        return result;
+    }
 }
