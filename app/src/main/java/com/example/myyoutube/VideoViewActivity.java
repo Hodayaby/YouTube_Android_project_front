@@ -146,7 +146,8 @@ public class VideoViewActivity extends AppCompatActivity {
                             mediaController.setAnchorView(videoView);
                             videoView.start();
                         } else {
-                            Toast.makeText(VideoViewActivity.this, resource.getError(), Toast.LENGTH_SHORT).show();
+                            String error = resource.getError();
+                            Toast.makeText(VideoViewActivity.this, error != null ? error : "Failed to download video", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

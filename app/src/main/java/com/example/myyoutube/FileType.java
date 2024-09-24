@@ -10,11 +10,11 @@ public enum FileType {
     PROFILE;
 
     public String getFileName(Video video) {
-        return video.getId() + "_" + this.name();
+        return video.get_id() + "_" + this.name();
     }
 
     public String getFileName(User user) {
-        return user.getId() + "_" + this.name();
+        return user.get_id() + "_" + this.name();
     }
 
     public File getFilePath(Context context, Video video) {

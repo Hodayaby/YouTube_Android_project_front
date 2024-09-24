@@ -12,9 +12,18 @@ import java.util.List;
 public class User {
     @PrimaryKey
     private int id;
+    private String _id;
     private String username;
     private String profilePicture;
     private String token;
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
 
     public int getId() {
         return id;

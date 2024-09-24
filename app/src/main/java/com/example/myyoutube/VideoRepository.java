@@ -126,7 +126,7 @@ public class VideoRepository {
         MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
 
         // Generate the filename based on the video ID and file type
-        String fileName = user.getId() + "_" + FileType.PROFILE.name();
+        String fileName = user.get_id() + "_" + FileType.PROFILE.name();
         File file = new File(context.getFilesDir(), fileName);
 
         // Check if the file exists
@@ -146,7 +146,7 @@ public class VideoRepository {
         MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
 
         // Generate the filename based on the video ID and file type
-        String fileName = video.getId() + "_" + fileType.name();
+        String fileName = video.get_id() + "_" + fileType.name();
         File file = new File(context.getFilesDir(), fileName);
 
         // Check if the file exists

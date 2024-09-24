@@ -11,6 +11,7 @@ import java.util.List;
 public class Video {
     @PrimaryKey
     private int id;
+    private String _id;
     private String title;
     private String url;
     private String thumbnail;
@@ -21,6 +22,14 @@ public class Video {
     @Ignore
     private List<Comment> comments = new ArrayList<>();
     private List<String> likes = new ArrayList<>();
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
 
     public int getId() {
         return id;
