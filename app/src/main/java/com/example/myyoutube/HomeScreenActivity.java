@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,9 +53,13 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     private User currentUser;
     private boolean showingFavoriteVideos = false;
 
+    private VideoViewModel videoViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        videoViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
 
         // Set theme based on ThemeManager
         setDarkMode(ThemeManager.isDarkMode());
@@ -107,18 +113,9 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         updateUserDetails();
 
         // Initialize adapter and RecyclerView
-        postsListAdapter = new PostsListAdapter(this, this);
+        postsListAdapter = new PostsListAdapter(this, this, videoViewModel);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(postsListAdapter);
-
-        // Load videos from JSON file if the lists are empty
-        if (userListManager.getAllPosts().isEmpty()) {
-            Toast.makeText(this, "Loading videos...", Toast.LENGTH_SHORT).show();
-            loadVideosFromJSON();
-        } else {
-            // Update adapter with existing posts
-            refreshPostList();
-        }
 
         // Set up search bar text change listener to filter posts based on search input
         searchBar.addTextChangedListener(new TextWatcher() {
@@ -130,7 +127,9 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Filter the posts based on search input
-                postsListAdapter.getFilter().filter(s.toString());
+                if (count > 0 || (count == 0 && before > 0)) {
+                    postsListAdapter.getFilter().filter(s.toString());
+                }
             }
 
             @Override
@@ -146,7 +145,7 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
 
             // If showing favorite videos, reload all videos
             if (showingFavoriteVideos) {
-                refreshPostList();
+//                refreshPostList();
                 showingFavoriteVideos = false;
             }
         });
@@ -191,7 +190,20 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
     protected void onResume() {
         super.onResume();
         searchBar.setText("");
-        refreshPostList();
+
+        // Observe the LiveData from the ViewModel
+        videoViewModel.getAllVideos().observe(this, new Observer<Resource<List<Video>>>() {
+            @Override
+            public void onChanged(Resource<List<Video>> resource) {
+                if (resource.isSuccess()) {
+                    List<Video> videos = resource.getData();
+                    postsListAdapter.setPosts(videos);
+                } else {
+                    String errorMessage = resource.getError();
+                    Toast.makeText(HomeScreenActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     // Set dark mode based on the current theme
@@ -211,38 +223,6 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         } else {
             menuItem.setTitle("Dark Mode");
             menuItem.setIcon(R.drawable.ic_dark); // Replace with the moon icon
-        }
-    }
-
-    // Load videos from JSON file located in the resources
-    private void loadVideosFromJSON() {
-        try {
-            // Load JSON file from resources
-            InputStream inputStream = getResources().openRawResource(R.raw.videos);
-            String json = new Scanner(inputStream).useDelimiter("\\A").next();
-            JSONArray jsonArray = new JSONArray(json);
-
-            // Parse JSON and create Post objects
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Post post = new Post(
-                        jsonObject.getString("author"),
-                        jsonObject.getString("content"),
-                        jsonObject.getString("description"),
-                        "android.resource://com.example.myyoutube/drawable/" + jsonObject.getString("thumbnail"), // Using string path for image
-                        getResources().getIdentifier(jsonObject.getString("channelImage"), "drawable", getPackageName()),
-                        jsonObject.getString("views"),
-                        jsonObject.getString("uploadTime"),
-                        jsonObject.getString("videoUri")
-                );
-                userListManager.addPost(post); // Add to all posts list as well
-            }
-
-            // Update adapter with the posts
-            refreshPostList();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
@@ -284,16 +264,11 @@ public class HomeScreenActivity extends AppCompatActivity implements PostsListAd
         currentUser = userListManager.getCurrentUser();
         if (currentUser != null && currentUser.getUsername() != null) {
             List<Post> likedPosts = currentUser.getLikedPosts();
-            postsListAdapter.setPosts(likedPosts);
+//            postsListAdapter.setPosts(likedPosts);
             showingFavoriteVideos = true; // Update the flag
         } else {
             Toast.makeText(this, "Please login to see your favorite videos", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    // Refresh the post list with all posts
-    private void refreshPostList() {
-        postsListAdapter.setPosts(userListManager.getAllPosts());
     }
 
     // Handle user logout action

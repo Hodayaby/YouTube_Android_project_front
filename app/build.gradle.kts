@@ -38,13 +38,14 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.gson)
-//    implementation(libs.room.common)
-//    implementation(libs.room.common.jvm)
+    implementation(libs.roomruntime)
+    annotationProcessor(libs.roomcompiler)
     implementation(libs.swiperefreshlayout)
-    implementation(libs.room.common)
+//    implementation(libs.room.common)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-
+    implementation(libs.retrofit)
+    implementation(libs.retrofitgson)
 }
